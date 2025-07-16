@@ -1,0 +1,44 @@
+/* General Background & Text */
+.wcagaat-dark-mode #bbpress-forums label,
+.wcagaat-dark-mode #bbpress-forums legend,
+.wcagaat-dark-mode #bbpress-forums div {
+  color: white !important;
+}
+
+/* Links */
+.wcagaat-dark-mode #bbpress-forums a,
+.wcagaat-dark-mode .x-bbp-item-info-content .x-bbp-item-info-author .bbp-author-name {
+  border-bottom: 2px solid rgba(0,0,0,0) !important;
+  color: #fbd46d !important;
+  transition: all ease-in .1s;
+  -webkit-transition: all ease-in .1s;
+  -moz-transition: all ease-in .1s;
+  -o-transition: all ease-in .1s;
+}
+
+.wcagaat-dark-mode #bbpress-forums a:hover,
+.wcagaat-dark-mode .x-bbp-item-info-content .x-bbp-item-info-author .bbp-author-name:hover {
+  color: #ffffff !important;
+  border-bottom: 2px solid #cb9700 !important;
+}
+
+/* Forums */
+.wcagaat-dark-mode .x-bbp-item-info-header,
+.wcagaat-dark-mode .bbp-header,
+.wcagaat-dark-mode .bbp-footer {
+  background-color: #013765;
+}
+
+.wcagaat-dark-mode .bbp-body>ul,
+.wcagaat-dark-mode .bbp-body>div.hentry {
+  background-color: #111111;
+  border: 1px solid rgba(255,255,255,.25);
+}
+
+.wcagaat-dark-mode .x-bbp-item-info-header .bbp-admin-links a {
+  background-color: #001f39;
+}
+
+.wcagaat-dark-mode .bbp-template-notice {
+  background-color: #006630;
+}

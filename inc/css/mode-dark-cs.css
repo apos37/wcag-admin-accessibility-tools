@@ -1,0 +1,145 @@
+/* Dark Mode */
+.wcagaat-dark-mode .search .x-header-landmark {
+  background-color: rgba(0, 31, 57, 0.5);
+}
+
+/* General Background & Text */
+.wcagaat-dark-mode .x-root .site,
+.wcagaat-dark-mode .x-main.full {
+	background-color: #222222;
+}
+
+.wcagaat-dark-mode .x-section { 
+  color: white;
+}
+
+.wcagaat-dark-mode .x-row .h1-default h1, 
+.wcagaat-dark-mode .x-row .h3-default h3, 
+.wcagaat-dark-mode .x-row .h5-default h5 {
+  color: #3dcbdb !important;
+}
+
+.wcagaat-dark-mode .x-row .h2-default h2, 
+.wcagaat-dark-mode .x-row .h4-default h4, 
+.wcagaat-dark-mode .x-row .h6-default h6 {
+  color: #fbd46d !important;
+}
+
+.wcagaat-dark-mode .x-row .x-text,
+.wcagaat-dark-mode .x-row .x-text-content-text-primary,
+.wcagaat-dark-mode .x-row .x-text-content-text-subheadline {
+  color: white !important;
+}
+
+.wcagaat-dark-mode .x-breadcrumb-wrap {
+  background-color: #191919;
+}
+
+.wcagaat-dark-mode .x-breadcrumb-wrap span {
+  color: white;
+}
+
+/* Darken Column */
+.wcagaat-dark-mode .x-acc-content {
+  background-color: rgb(0,0,0,.75);
+}
+
+/* Background Images/Layer Color */
+.wcagaat-dark-mode .dark-img .x-bg-layer-lower-image,
+.wcagaat-dark-mode .dark-img .x-bg-layer-upper-image {
+  opacity: .25;
+}
+
+.wcagaat-dark-mode .dark-img .x-bg-layer-lower-color,
+.wcagaat-dark-mode .dark-img .x-bg-layer-upper-color {
+  opacity: .25;
+}
+
+/*** Header ***/
+.wcagaat-dark-mode .x-navbar {
+  background: linear-gradient(90deg, #222222 0%, #222222 30%, #001f39 40%);
+}
+
+/* Topbar */
+.wcagaat-dark-mode .x-topbar {
+  background-color: #222222;
+}
+
+/* Navigation */
+.wcagaat-dark-mode .x-navbar {
+	border-bottom: 3px solid #001f39;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav li a,
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .hide-active a {
+  box-shadow: 0 3px 0 0 #001f39;
+  color: white;
+  border-right: 1px solid #222222;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav li:not(.current-menu-item) a:hover,
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .current-menu-item.hide-active a:hover{
+  background-color: #013765;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav li a:hover  {
+  box-shadow: 0 3px 0 0 #3dcbdb;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .current-menu-item:not(.hide-active) a {
+  background-color: #013765;
+  box-shadow: 0 3px 0 0 #cb9700;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .current-menu-item:not(.hide-active) a:hover  {
+  box-shadow: 0 3px 0 0 #3dcbdb;
+}
+
+/* Sub Navigation */
+.wcagaat-dark-mode .x-navbar .desktop .sub-menu a {
+  background-color: #001f39;
+  border-bottom: 1px solid #111111;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .sub-menu a:hover {
+  background-color: #013765 !important;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .current-menu-item:not(.hide-active) .sub-menu a {
+  background-color: #111111;
+}
+
+.wcagaat-dark-mode .x-navbar .desktop .x-nav .current-menu-item:not(.hide-active) .sub-menu a:hover {
+  background-color: #013765;
+}
+
+/* Links */
+.wcagaat-dark-mode .x-text a:not(.bookmark_link, .favorite_link, .efl-result-img-link, .button, .island-choice, .sticker-cont, .avatar-edit-icon, .remove-search-term, .fancy-name-edit-icon),
+.wcagaat-dark-mode .x-row .x-text-content-text-primary a,
+.wcagaat-dark-mode .x-bbp-item-info-content .x-bbp-item-info-author .bbp-author-name {
+  border-bottom: 2px solid rgba(0,0,0,0) !important;
+  color: #fbd46d !important;
+  transition: all ease-in .1s;
+  -webkit-transition: all ease-in .1s;
+  -moz-transition: all ease-in .1s;
+  -o-transition: all ease-in .1s;
+}
+
+.wcagaat-dark-mode .x-text a:not(.bookmark_link, .favorite_link, .efl-result-img-link, .button, .island-choice, .sticker-cont, .avatar-edit-icon, .remove-search-term, .fancy-name-edit-icon):hover,
+.wcagaat-dark-mode .x-row .x-text-content-text-primary a:hover,
+.wcagaat-dark-mode .x-bbp-item-info-content .x-bbp-item-info-author .bbp-author-name:hover {
+  color: #ffffff !important;
+  border-bottom: 2px solid #cb9700 !important;
+}
+
+.wcagaat-dark-mode .x-row :not(.x-acc-header-indicator) .x-icon:not(.favorite_link i, .avatar-edit-icon i),
+.wcagaat-dark-mode .x-row .bookmark-icon,
+.wcagaat-dark-mode .x-col .x-row-inner .x-graphic-icon {
+  color: #fbd46d;
+
+}
+.wcagaat-dark-mode .x-row .x-icon:not(.x-graphic-primary):hover,
+.wcagaat-dark-mode .x-row .bookmark-icon:hover,
+.wcagaat-dark-mode .x-col .x-row-inner .x-graphic-icon:hover {
+  color: #fbd46d !important;
+}

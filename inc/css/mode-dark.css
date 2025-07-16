@@ -1,0 +1,71 @@
+/* General Background & Text */
+.wcagaat-dark-mode,
+.wcagaat-dark-mode .dark-mode {
+	background-color: #222222;
+}
+
+.wcagaat-dark-mode,
+.wcagaat-dark-mode .dark-mode {
+  color: white;
+}
+
+.wcagaat-dark-mode h1, 
+.wcagaat-dark-mode h3, 
+.wcagaat-dark-mode h5 {
+  color: #3dcbdb !important;
+}
+
+.wcagaat-dark-mode h2, 
+.wcagaat-dark-mode h4, 
+.wcagaat-dark-mode h6 {
+  color: #fbd46d !important;
+}
+
+.wcagaat-dark-mode ul li {
+  color: white !important;
+}
+
+.wcagaat-dark-mode .entry-wrap p {
+  color: white;
+}
+
+.wcagaat-dark-mode polygon {
+  fill: #222222;
+}
+
+/* Darken Column */
+.wcagaat-dark-mode .col-float {
+  background-color: rgb(0,0,0,.75);
+}
+
+.wcagaat-dark-mode .dark-lvl1 {
+  background-color: rgb(0,0,0,.55);
+}
+
+.wcagaat-dark-mode .dark-lvl2 {
+  background-color: rgb(0,0,0,.75);
+}
+
+.wcagaat-dark-mode .dark-gray {
+  background-color: #222222;
+}
+
+/* Topbar */
+.wcagaat-dark-mode #topbar-account,
+.wcagaat-dark-mode #topbar-account a {
+  color: white;
+}
+
+.wcagaat-dark-mode #topbar-account a:hover {
+  color: #3dcbdb;
+}
+
+/* Favorites */
+.wcagaat-dark-mode .favorite {
+  color: #fbd46d;
+
+}
+
+.wcagaat-dark-mode .favorite:hover {
+  color: #fbd46d !important;
+}

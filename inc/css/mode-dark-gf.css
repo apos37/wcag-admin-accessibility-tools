@@ -1,0 +1,121 @@
+/* Text */
+.wcagaat-dark-mode .gform-body h2,
+.wcagaat-dark-mode .gform-body h3 {
+  color: white !important;
+}
+
+/* Labels */
+.wcagaat-dark-mode .gfield_label {
+  color: #fbd46d !important;
+}
+
+.wcagaat-dark-mode .gform_wrapper.gravity-theme .gfield_required {
+  color: #66ff99;
+}
+
+/* Radio */
+.wcagaat-dark-mode .gchoice input[type="radio"] {
+  color: #3dcbdb;
+  border: 0.15em solid #3dcbdb;
+}
+
+.wcagaat-dark-mode .gchoice input[type="radio"]::before {
+  box-shadow: inset 1em 1em #ffffff;
+  background-color: #3dcbdb;
+}
+
+.wcagaat-dark-mode .gchoice input[type="radio"]:checked {
+  color: #3dcbdb;
+  background-color: #3dcbdb;
+}
+
+.wcagaat-dark-mode .gchoice input[type="radio"]:focus {
+  outline: max(1px, 0.05em) solid #cb9700 !important;
+}
+
+/* Checkboxes */
+.wcagaat-dark-mode .gchoice input[type="checkbox"] {
+  color: #3dcbdb !important;
+  border: 0.15em solid #3dcbdb !important;
+}
+
+.wcagaat-dark-mode .gchoice input[type="checkbox"]::before {
+  box-shadow: inset 1em 1em #000000 !important;
+}
+
+.wcagaat-dark-mode .gchoice input[type="checkbox"]:checked {
+  color: #3dcbdb !important;
+  background-color: #3dcbdb !important;
+  border: 0.15em solid #3dcbdb !important;
+}
+
+.wcagaat-dark-mode .gchoice input[type="checkbox"]:focus {
+  outline: max(2px, 0.1em) solid #cb9700 !important;
+}
+
+/* Consent Checkbock */
+.wcagaat-dark-mode .ginput_container_consent input[type="checkbox"] {
+  color: #3dcbdb;
+  border: 0.15em solid #3dcbdb;
+}
+
+.wcagaat-dark-mode .ginput_container_consent input[type="checkbox"]::before {
+  box-shadow: inset 1em 1em #000000;
+}
+
+.wcagaat-dark-mode .ginput_container_consent input[type="checkbox"]:checked {
+  color: #3dcbdb;
+  background-color: #3dcbdb;
+  border: 0.15em solid #3dcbdb;
+}
+
+.wcagaat-dark-mode .ginput_container_consent input[type="checkbox"]:focus {
+  outline: max(2px, 0.1em) solid #cb9700 !important;
+}
+
+/* Text Input */
+.wcagaat-dark-mode .ginput_container input:focus,
+.wcagaat-dark-mode .gfield_select:focus,
+.wcagaat-dark-mode .textarea:focus,
+.wcagaat-dark-mode .ginput_container_number .small:focus,
+.wcagaat-dark-mode .gform_wrapper input[type="text"]:focus,
+.wcagaat-dark-mode .gform_wrapper input[type="email"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 2px solid #cb9700 !important;
+  transition: none;
+}
+
+.wcagaat-dark-mode .gform_wrapper.gravity-theme label,
+.wcagaat-dark-mode .gsection_description {
+  font-size: 1rem  !important;
+}
+
+.wcagaat-dark-mode .gsection {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.wcagaat-dark-mode .gf_ul a {
+  text-decoration: underline !important;
+}
+
+.wcagaat-dark-mode .gf_ul a:hover {
+  color: #000000;
+  border-bottom: 2px solid #cb9700 !important;
+}
+
+/* Buttons */
+.wcagaat-dark-mode .gform_next_button:hover {
+  background-color: #006630!important;
+}
+
+/* Form Messages */
+.wcagaat-dark-mode .gform_wrapper .gfield_validation_message {
+  color: #A72711 !important;
+}
+
+/* Likert Scale */
+.wcagaat-dark-mode .gravity-theme table.gsurvey-likert th.gsurvey-likert-choice-label {
+  background-color: #111111;
+}

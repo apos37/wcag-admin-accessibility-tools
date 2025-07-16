@@ -1,0 +1,12 @@
+/* LearnDash */
+.wcagaat-dark-mode .learndash-wrapper .ld-content-actions {
+  border-top: 2px solid white;
+}
+
+.wcagaat-dark-mode .ld-primary-color {
+  color: #fbd46d !important;
+}
+
+.wcagaat-dark-mode .learndash-wrapper .ld-expand-button.ld-button-alternate .ld-text {
+  color: #013765 !important;
+}

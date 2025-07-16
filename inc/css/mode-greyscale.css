@@ -1,0 +1,5 @@
+/* Greyscale */
+.wcagaat-greyscale-mode #site-content,
+.wcagaat-greyscale-mode .x-root {
+	filter: grayscale(100%);
+}

@@ -1,0 +1,15 @@
+a.wcagaat-skip-link {
+    position: absolute;
+    top: -1000px;
+    left: -1000px;
+    background: #000 !important;
+    color: #fff !important;
+    padding: 8px 12px;
+    z-index: 999;
+    text-decoration: underline;
+}
+
+.wcagaat-skip-link:focus {
+    top: 10px;
+    left: 10px;
+}
