@@ -63,7 +63,7 @@ define( 'WCAGAAT_DISCORD_URL', $plugin_data[ 'discord_uri' ] );
 // Paths
 define( 'WCAGAAT_BASENAME', plugin_basename( __FILE__ ) );                                          //: text-domain/text-domain.php
 define( 'WCAGAAT_ABSPATH', plugin_dir_path( __FILE__ ) );                                           //: /home/.../public_html/wp-content/plugins/text-domain/
-define( 'WCAGAAT_DIR', plugins_url( '/' . WCAGAAT_TEXTDOMAIN . '/' ) );                             //: https://domain.com/wp-content/plugins/text-domain/
+define( 'WCAGAAT_DIR', plugin_dir_url( __FILE__ ) );                                                //: https://domain.com/wp-content/plugins/text-domain/
 define( 'WCAGAAT_INCLUDES_ABSPATH', WCAGAAT_ABSPATH . 'inc/' );                                     //: /home/.../public_html/wp-content/plugins/text-domain/inc/
 define( 'WCAGAAT_INCLUDES_DIR', WCAGAAT_DIR . 'inc/' );                                             //: https://domain.com/wp-content/plugins/text-domain/inc/
 define( 'WCAGAAT_JS_PATH', WCAGAAT_INCLUDES_DIR . 'js/' );                                          //: https://domain.com/wp-content/plugins/text-domain/inc/js/

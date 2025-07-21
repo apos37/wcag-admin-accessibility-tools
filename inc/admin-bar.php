@@ -73,7 +73,7 @@ class AdminBar {
         // The main toolbar menu item
         $wp_admin_bar->add_node( [
             'id'    => 'wcagaat',
-            'title' => '<span class="ab-icon dashicons ' . esc_attr( $this->dashicon ) . '" title="' . esc_attr( WCAGAAT_NAME ) . '"></span><span class="ab-label">' . __( 'A11y Tools', 'wcag-admin-accessibility-tools' ) . '</span>',
+            'title' => '<span class="ab-icon dashicons ' . esc_attr( $this->dashicon ) . '" title="' . esc_attr( WCAGAAT_NAME ) . '"></span><span class="ab-label">' . __( 'A11y Tools ', 'wcag-admin-accessibility-tools' ) . '</span>',
             'href'  => false,
         ] );
 
@@ -128,7 +128,7 @@ class AdminBar {
 		$handle = 'wcagaat_admin_bar';
         wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'admin-bar.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
-		wp_localize_script( $handle, 'admin_bar', [
+		wp_localize_script( $handle, $handle, [
             'ajaxurl'         => admin_url( 'admin-ajax.php' ),
             'nonce'           => wp_create_nonce( $this->nonce_alt_text ),
             'doing_aaa'       => filter_var( get_option( 'wcagaat_contrast_aaa' ), FILTER_VALIDATE_BOOLEAN ),

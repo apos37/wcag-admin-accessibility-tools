@@ -103,7 +103,7 @@ jQuery( $ => {
 
             if ( !alt.trim() && !img.parent().hasClass( 'wcagaat-missing-wrapper' ) ) {
                 if ( !countOnly ) {
-                    img.wrap( `<div class="wcagaat-missing-wrapper" data-label="⚠️ ${admin_bar.text.missing}"></div>` );
+                    img.wrap( `<div class="wcagaat-missing-wrapper" data-label="⚠️ ${wcagaat_admin_bar.text.missing}"></div>` );
                 }
                 count++;
             }
@@ -129,7 +129,7 @@ jQuery( $ => {
      * Poor Color Contrast
      */
     function checkColorContrast( countOnly = false ) {
-        const useAAA = admin_bar.doing_aaa;
+        const useAAA = wcagaat_admin_bar.doing_aaa;
         let count = 0;
 
         $( '*:visible' ).not( '#wpadminbar *, #wcagaat-mode-switch *, .wcagaat-skip-link' ).each( function() {
@@ -307,7 +307,7 @@ jQuery( $ => {
      * Vague Link Text
      */
     function checkVagueLinkTexts( countOnly = false ) {
-        const vaguePhrases = admin_bar.vague_link_text
+        const vaguePhrases = wcagaat_admin_bar.vague_link_text
             .split( ',' )
             .map( phrase => phrase.trim().toLowerCase() )
             .filter( phrase => phrase.length > 0 );

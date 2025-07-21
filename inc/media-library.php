@@ -259,9 +259,9 @@ class MediaLibrary {
             return;
         }
 
-        $handle = 'media-alt-edit';
+        $handle = 'wcagaat_media_alt_edit';
         wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'media-library.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
-        wp_localize_script( $handle, 'media_alt_edit', [
+        wp_localize_script( $handle, $handle, [
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( $this->nonce ),
             'text'    => [

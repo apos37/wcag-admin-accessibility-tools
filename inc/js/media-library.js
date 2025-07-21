@@ -12,7 +12,7 @@ jQuery( $ => {
 
         var $editArea = $cell.find( '.alt-text-editing' );
         var $input = $( '<input type="text" class="alt-text-input" />' ).val( current );
-        var $button = $( `<button class="button alt-text-save">${media_alt_edit.text.update}</button>` );
+        var $button = $( `<button class="button alt-text-save">${wcagaat_media_alt_edit.text.update}</button>` );
 
         $display.hide();
         $link.closest( '.row-actions' ).hide();
@@ -31,11 +31,11 @@ jQuery( $ => {
 
             var newVal = $input.val();
 
-            $.post( media_alt_edit.ajaxurl, {
+            $.post( wcagaat_media_alt_edit.ajaxurl, {
                 action: 'update_alt_text',
                 post_id: id,
                 alt_text: newVal,
-                nonce: media_alt_edit.nonce
+                nonce: wcagaat_media_alt_edit.nonce
             }, function( response ) {
                 if ( response.success ) {
                     $display.text( response.data ).show();

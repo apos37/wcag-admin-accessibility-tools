@@ -20,6 +20,20 @@
     -ms-user-select: none;
 }
 
+#wp-admin-bar-wcagaat .plugin-count {
+    display: inline-block;
+    min-width: 18px;
+    padding: 4px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    background: #d63638;
+    border-radius: 10px;
+    margin-left: 6px;
+    text-align: center;
+}
+
 /* Image Alt Text */
 .wcagaat-missing-alt {
     outline: 3px solid #c00;
