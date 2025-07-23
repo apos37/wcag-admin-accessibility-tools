@@ -155,6 +155,11 @@ class Settings {
 	 * @return array
 	 */
 	public function options() {
+        // Check if the skip link is needed
+        $skip_link_needed = sanitize_key( get_option( 'wcagaat_skip_link_present', 'no' ) );
+        $warning = ( $skip_link_needed === 'yes' ) ? '<div class="wcagaat-warning">' . esc_html__( 'Warning: A skip link has already been detected in your theme or another plugin. Enabling this option may cause duplicate skip links.', 'wcag-admin-accessibility-tools' ) . '</div>' : '';
+
+        // Options
 		$options = [
             [
                 'section'   => 'structural',
@@ -162,8 +167,9 @@ class Settings {
                 'sanitize'  => 'sanitize_checkbox',
                 'key'       => 'wcagaat_skip_link',
                 'title'     => __( 'Skip to Content Link', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a visually hidden "Skip to main content" link at the top of every page for improved keyboard navigation.', 'wcag-admin-accessibility-tools' ),
+                'desc'      => __( 'Adds a visually hidden "Skip to main content" link at the top of every page for improved keyboard navigation. Before enabling, please ensure this link has not already been added by your theme or a different plugin.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
+                'comments'  => $warning,
             ],
             [
                 'section'   => 'images',
@@ -259,7 +265,7 @@ class Settings {
                 'sanitize'  => 'sanitize_url',
                 'key'       => 'wcagaat_dark_logo',
                 'title'     => __( 'Alternative Logo for Dark Mode', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Optional. Provide the URL of a high-contrast or light-colored logo to be used automatically when dark mode is enabled.', 'wcag-admin-accessibility-tools' ),
+                'desc'      => __( 'Optional. Provide the URL of a light-colored logo to be used automatically when dark mode is enabled.', 'wcag-admin-accessibility-tools' ),
                 'default'   => '',
                 'conditions'=> [ 'wcagaat_mode_visibility' ],
             ],
@@ -446,10 +452,12 @@ class Settings {
 					</svg>
 					<span class="label">%3$s</span>
 				</span>
-			</label>',
+			</label>
+            %4$s',
 			esc_attr( $id ),
 			checked( $value, 1, false ),
-			esc_html( $label )
+			esc_html( $label ),
+			wp_kses_post( isset( $args[ 'comments' ] ) ? $args[ 'comments' ] : '' )
 		);
 	} // End settings_field_checkbox()
 

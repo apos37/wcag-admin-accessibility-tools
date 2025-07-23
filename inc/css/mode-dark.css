@@ -63,9 +63,14 @@
 /* Favorites */
 .wcagaat-dark-mode .favorite {
   color: #fbd46d;
-
 }
 
 .wcagaat-dark-mode .favorite:hover {
   color: #fbd46d !important;
+}
+
+/* Clear Cache Everywhere Notice */
+.wcagaat-dark-mode .cce-clear-cache-message {
+  background-color: #1D2327;
+  color: white;
 }

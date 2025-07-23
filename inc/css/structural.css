@@ -1,4 +1,4 @@
-a.wcagaat-skip-link {
+html body a.wcagaat-skip-link {
     position: absolute;
     top: -1000px;
     left: -1000px;
@@ -7,6 +7,14 @@ a.wcagaat-skip-link {
     padding: 8px 12px;
     z-index: 999;
     text-decoration: underline;
+}
+
+html body.wcagaat-dark-mode a.wcagaat-skip-link,
+html body.wcagaat-dark-mode a.skip-link,
+html body a.skip-link {
+    background: #000 !important;
+    color: #fff !important;
+    text-decoration: underline !important;
 }
 
 .wcagaat-skip-link:focus {

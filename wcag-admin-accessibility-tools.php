@@ -45,7 +45,7 @@ $plugin_data = get_file_data( __FILE__, [
 
 // Versions
 define( 'WCAGAAT_VERSION', $plugin_data[ 'version' ] );
-define( 'WCAGAAT_SCRIPT_VERSION', WCAGAAT_VERSION );                                                // TODO: REPLACE WITH time() DURING TESTING
+define( 'WCAGAAT_SCRIPT_VERSION', time() );                                                // TODO: REPLACE WITH time() DURING TESTING
 define( 'WCAGAAT_MIN_PHP_VERSION', $plugin_data[ 'requires_php' ] );
 
 // Names

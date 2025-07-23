@@ -44,8 +44,11 @@ WCAG Admin Accessibility Tools gives you clear, actionable insights directly in 
 = Does this plugin automatically make my site accessible? =
 No — WCAG Admin Accessibility Tools is not a one-click solution. It offers some very basic enhancements and provides tools that help you identify and resolve common accessibility issues more efficiently. We recommend also using the WAZE browser extension by WebAIM to identify further issues like missing aria labels, etc.
 
-= Will more accessibility tools be added? =
-Yes. This plugin is being actively developed.
+= Will this add a fully-ready Dark Mode to my site? =
+No. This plugin applies basic dark mode styling to standard elements and provides tools to help you implement a dark mode. However, due to variations in theme structures and styles, you will need to write additional custom CSS to ensure full compatibility across your site.
+
+= Why isn't there a "High Contrast" mode? =
+High contrast requirements vary significantly depending on user needs and content structure. Instead of enforcing a single high contrast scheme, this plugin provides a color contrast checker and markup tools so you can evaluate and customize contrast levels according to WCAG AA or AAA guidelines. If your site's color contrast is implemented correctly, a separate "High Contrast" mode is unnecessary. For users who prioritize stronger contrast, enabling AAA standards in the plugin settings is recommended.
 
 = Where can I request features and get further support? =
 We recommend using our [website support forum](https://pluginrx.com/support/plugin/wcag-admin-accessibility-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/wcag-admin-accessibility-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.

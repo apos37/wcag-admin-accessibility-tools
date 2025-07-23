@@ -106,12 +106,6 @@ class Modes {
                 'active' => __( 'Dark mode activated', 'wcag-admin-accessibility-tools' ),
                 'icon'   => 'f186', // fa-moon
             ],
-            // 'high-contrast' => [
-            //     'label'  => __( 'High Contrast', 'wcag-admin-accessibility-tools' ),
-            //     'switch' => __( 'Switch to high contrast mode', 'wcag-admin-accessibility-tools' ),
-            //     'active' => __( 'High contrast mode activated', 'wcag-admin-accessibility-tools' ),
-            //     'icon'   => 'f06a', // fa-circle-exclamation
-            // ],
             'greyscale' => [
                 'label'  => __( 'Greyscale', 'wcag-admin-accessibility-tools' ),
                 'switch' => __( 'Switch to greyscale mode', 'wcag-admin-accessibility-tools' ),
@@ -386,7 +380,6 @@ class Modes {
         // CSS
         wp_enqueue_style( 'wcagaat_modes_css', WCAGAAT_CSS_PATH . 'modes.css', [], WCAGAAT_SCRIPT_VERSION );
         wp_enqueue_style( 'wcagaat_modes_greyscale_css', WCAGAAT_CSS_PATH . 'mode-greyscale.css', [], WCAGAAT_SCRIPT_VERSION );
-        wp_enqueue_style( 'wcagaat_modes_high_contrast_css', WCAGAAT_CSS_PATH . 'mode-high-contrast.css', [], WCAGAAT_SCRIPT_VERSION );
         wp_enqueue_style( 'wcagaat_modes_dark_css', WCAGAAT_CSS_PATH . 'mode-dark.css', [], WCAGAAT_SCRIPT_VERSION );
 
         // Integration-specific dark mode CSS

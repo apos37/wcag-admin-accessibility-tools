@@ -106,6 +106,7 @@ jQuery( $ => {
                     img.wrap( `<div class="wcagaat-missing-wrapper" data-label="⚠️ ${wcagaat_admin_bar.text.missing}"></div>` );
                 }
                 count++;
+                console.log( 'Missing alt text for image:', img[0] );
             }
         } );
 
@@ -132,7 +133,7 @@ jQuery( $ => {
         const useAAA = wcagaat_admin_bar.doing_aaa;
         let count = 0;
 
-        $( '*:visible' ).not( '#wpadminbar *, #wcagaat-mode-switch *, .wcagaat-skip-link' ).each( function() {
+        $( '*:visible' ).not( '#wpadminbar *, #wcagaat-mode-switch *, .wcagaat-skip-link, .skip-link', ).each( function() {
             const $el = $( this );
             if ( $el.children().length ) return;
 
@@ -167,9 +168,9 @@ jQuery( $ => {
                     return;
                 }
 
+                console.log( 'Color Contrast Issue:', $el[0], ' | Foreground:', fg, ' | Background:', bg );
+
                 if ( !countOnly ) {
-                    
-                    // console.log( text, fg, bg );
 
                     const fgHex = rgbToHex( fg );
                     const bgHex = rgbToHex( bg );
@@ -320,6 +321,8 @@ jQuery( $ => {
 
             if ( !linkText ) return;
 
+            if ( $link.attr( 'aria-label' ) ) return;
+
             if ( vaguePhrases.includes( linkText.toLowerCase() ) ) {
                 if ( !$link.hasClass( 'wcagaat-vague-link-text' ) ) {
                     if ( !countOnly ) {
@@ -410,8 +413,11 @@ jQuery( $ => {
                 link.className.match( /button/i ) ||
                 $link.hasClass( 'btn' ) ||
                 $link.closest( 'nav' ).length ||
+                $link.closest( '.menu' ).length ||
                 $link.closest( '#wpadminbar' ).length ||
-                $link.closest( 'button' ).length
+                $link.closest( 'button' ).length ||
+                $link.closest( '#forum-navigation' ).length ||
+                $link.closest( '.skip-link' ).length
             ) {
                 return;
             }
@@ -422,7 +428,8 @@ jQuery( $ => {
             const computed = window.getComputedStyle( link );
             const decoration = computed.textDecorationLine || computed.textDecoration;
 
-            if ( decoration !== 'underline' ) {
+            if ( decoration !== 'underline' && !looksLikeButton( computed ) ) {
+                console.log( 'Link missing underline:', link );
                 count++;
 
                 if ( !countOnly && !$link.hasClass( 'wcagaat-underline-issue' ) ) {
@@ -439,6 +446,21 @@ jQuery( $ => {
         if ( countOnly ) {
             $( '.wcagaat-count[data-tool="underline-links"]' ).text( count > 0 ? `(${count})` : '(0)' );
         }
+    }
+
+    function looksLikeButton( computed ) {
+        const bg = computed.backgroundColor;
+        const borderRadius = parseFloat( computed.borderRadius );
+        const paddingTop = parseFloat( computed.paddingTop );
+        const paddingBottom = parseFloat( computed.paddingBottom );
+        const paddingLeft = parseFloat( computed.paddingLeft );
+        const paddingRight = parseFloat( computed.paddingRight );
+
+        const hasBackground = bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent';
+        const hasRoundedCorners = borderRadius > 3;
+        const hasPadding = ( paddingTop + paddingBottom + paddingLeft + paddingRight ) > 10;
+
+        return hasBackground && hasRoundedCorners && hasPadding;
     }
 
     function removeUnderlineIssues() {

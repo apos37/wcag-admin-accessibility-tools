@@ -1,5 +1,10 @@
 /* Greyscale */
+.wcagaat-greyscale-mode .site-header,
+.wcagaat-greyscale-mode #site-header,
+.wcagaat-greyscale-mode .site-content,
 .wcagaat-greyscale-mode #site-content,
-.wcagaat-greyscale-mode .x-root {
+.wcagaat-greyscale-mode .x-root,
+.wcagaat-greyscale-mode .site-footer,
+.wcagaat-greyscale-mode #site-footer {
 	filter: grayscale(100%);
 }

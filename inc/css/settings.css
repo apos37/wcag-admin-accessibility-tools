@@ -217,6 +217,20 @@
 	display: none;
 }
 
+.wcagaat-warning {
+    margin-left: 2rem;
+    color: red;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.wcagaat-warning::before {
+	content: "⚠️ ";
+	color: #facc15;
+	font-weight: bold;
+	margin-right: 4px;
+}
+
 /* Code */
 .wcagaat-settings-wrapper code {
     border-radius: 5px;
