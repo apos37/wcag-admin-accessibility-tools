@@ -101,7 +101,6 @@ class Structural {
 
             // Look for known skip link markers
             if ( stripos( $cleaned_html, 'skip-link' ) !== false ) {
-                ddtt_write_log( 'Skip link found' );
                 return true;
             }
         }

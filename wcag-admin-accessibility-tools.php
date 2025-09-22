@@ -2,7 +2,7 @@
 /**
  * Plugin Name:         WCAG Admin Accessibility Tools
  * Plugin URI:          https://pluginrx.com/plugin/wcag-admin-accessibility-tools/
- * Description:         Admin-side accessibility enhancements including alt text editing and tools to assist with WCAG compliance.
+ * Description:         Admin-side accessibility enhancements and tools to assist with WCAG compliance.
  * Version:             1.0.1
  * Requires at least:   5.9
  * Tested up to:        6.8
@@ -45,7 +45,7 @@ $plugin_data = get_file_data( __FILE__, [
 
 // Versions
 define( 'WCAGAAT_VERSION', $plugin_data[ 'version' ] );
-define( 'WCAGAAT_SCRIPT_VERSION', time() );                                                // TODO: REPLACE WITH time() DURING TESTING
+define( 'WCAGAAT_SCRIPT_VERSION', time() );                                                 // TODO: REPLACE WITH time() DURING TESTING
 define( 'WCAGAAT_MIN_PHP_VERSION', $plugin_data[ 'requires_php' ] );
 
 // Names
@@ -84,6 +84,7 @@ require_once WCAGAAT_INCLUDES_ABSPATH . 'settings.php';
 require_once WCAGAAT_INCLUDES_ABSPATH . 'media-library.php';
 require_once WCAGAAT_INCLUDES_ABSPATH . 'structural.php';
 require_once WCAGAAT_INCLUDES_ABSPATH . 'modes.php';
+require_once WCAGAAT_INCLUDES_ABSPATH . 'forms.php';
 
 if ( get_option( 'wcagaat_frontend_tools', true ) ) {
     require_once WCAGAAT_INCLUDES_ABSPATH . 'admin-bar.php';

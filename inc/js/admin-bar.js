@@ -99,9 +99,9 @@ jQuery( $ => {
 
         $( 'img' ).not( '#wpadminbar img' ).each( function() {
             const img = $( this );
-            const alt = img.attr( 'alt' ) || '';
+            const alt = img.attr( 'alt' );
 
-            if ( !alt.trim() && !img.parent().hasClass( 'wcagaat-missing-wrapper' ) ) {
+            if ( ( alt === undefined || alt === null ) && !img.parent().hasClass( 'wcagaat-missing-wrapper' ) ) {
                 if ( !countOnly ) {
                     img.wrap( `<div class="wcagaat-missing-wrapper" data-label="⚠️ ${wcagaat_admin_bar.text.missing}"></div>` );
                 }
@@ -136,6 +136,8 @@ jQuery( $ => {
         $( '*:visible' ).not( '#wpadminbar *, #wcagaat-mode-switch *, .wcagaat-skip-link, .skip-link', ).each( function() {
             const $el = $( this );
             if ( $el.children().length ) return;
+
+            if ( getComputedStyle( this ).visibility === 'hidden' ) return;
 
             const text = $el.text().trim();
             if ( !text ) return;
@@ -408,7 +410,14 @@ jQuery( $ => {
             const link = this;
             const $link = $( link );
 
-            // Exclusion logic
+            // Ignore this link if it has more than one span or any div
+            const $spans = $link.children( 'span' );
+            const $divs = $link.children( 'div' );
+            if ( $spans.length > 1 || $divs.length > 0 ) {
+                return; 
+            }
+
+            // Other exclusion logic
             if (
                 link.className.match( /button/i ) ||
                 $link.hasClass( 'btn' ) ||

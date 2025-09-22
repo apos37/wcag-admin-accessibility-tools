@@ -124,6 +124,7 @@ class Settings {
 	public function sections() {
 		$sections = [
 			'structural' => __( 'Structural', 'wcag-admin-accessibility-tools' ),
+            'forms'      => __( 'Forms', 'wcag-admin-accessibility-tools' ),
 			'images'     => __( 'Images', 'wcag-admin-accessibility-tools' ),
             'previewer'  => __( 'Previewer', 'wcag-admin-accessibility-tools' ),
             'modes'      => __( 'Modes', 'wcag-admin-accessibility-tools' ),
@@ -170,6 +171,15 @@ class Settings {
                 'desc'      => __( 'Adds a visually hidden "Skip to main content" link at the top of every page for improved keyboard navigation. Before enabling, please ensure this link has not already been added by your theme or a different plugin.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
                 'comments'  => $warning,
+            ],
+            [
+                'section'   => 'forms',
+                'type'      => 'checkbox',
+                'sanitize'  => 'sanitize_checkbox',
+                'key'       => 'wcagaat_protected_password_eye',
+                'title'     => __( 'Display Password Eye for Page Passwords', 'wcag-admin-accessibility-tools' ),
+                'desc'      => __( 'Adds a "Show Password" toggle to password fields for improved accessibility.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
             ],
             [
                 'section'   => 'images',
