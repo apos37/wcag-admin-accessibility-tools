@@ -34,10 +34,10 @@ jQuery( $ => {
         if ( total > 0 ) {
             let $badge = $label.siblings( '.ab-issues' );
             if ( $badge.length === 0 ) {
-                $badge = $( '<span class="ab-issues update-plugins count-1"><span class="plugin-count"></span></span>' );
+                $badge = $( '<span class="wcagaat-count-indicator" title="' + wcagaat_admin_bar.text.total + '"></span>' );
                 $label.after( $badge );
             }
-            $badge.find( '.plugin-count' ).text( total );
+            $badge.text( total );
         } else {
             $label.siblings( '.ab-issues' ).remove();
         }

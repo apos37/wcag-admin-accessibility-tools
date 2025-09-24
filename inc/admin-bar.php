@@ -136,7 +136,8 @@ class AdminBar {
             'text'            => [
                 'edit'    => __( 'Edit', 'wcag-admin-accessibility-tools' ),
                 'update'  => __( 'Update', 'wcag-admin-accessibility-tools' ),
-                'missing' => __( 'Missing Alt Text', 'wcag-admin-accessibility-tools' )
+                'missing' => __( 'Missing Alt Text', 'wcag-admin-accessibility-tools' ),
+                'total'   => __( 'Total Issues Found', 'wcag-admin-accessibility-tools' ),
             ]
         ] );
 		wp_enqueue_style( WCAGAAT_TEXTDOMAIN . '-admin-bar', WCAGAAT_CSS_PATH . 'admin-bar.css', [], WCAGAAT_SCRIPT_VERSION );
