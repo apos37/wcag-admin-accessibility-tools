@@ -54,7 +54,7 @@ class MediaLibrary {
 
         // Alt text ajax (which is also used by the admin bar)
         if ( $this->doing_alt_text() || get_option( 'wcagaat_admin_bar', true ) ) {
-            add_action( 'wp_ajax_update_alt_text', [ $this, 'ajax_update_alt_text' ] );
+            add_action( 'wp_ajax_alt_text_update', [ $this, 'ajax_update_alt_text' ] );
         }
 
         // Alt text enqueue

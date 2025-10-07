@@ -32,7 +32,7 @@ jQuery( $ => {
             var newVal = $input.val();
 
             $.post( wcagaat_media_alt_edit.ajaxurl, {
-                action: 'update_alt_text',
+                action: 'alt_text_update',
                 post_id: id,
                 alt_text: newVal,
                 nonce: wcagaat_media_alt_edit.nonce

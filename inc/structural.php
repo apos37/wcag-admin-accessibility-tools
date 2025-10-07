@@ -62,7 +62,7 @@ class Structural {
      */
     public function maybe_cache_skip_link_check() {
         // Are we resetting the cache?
-        if ( is_admin() && isset( $_GET[ 'settings-updated' ] ) && sanitize_key( wp_unslash( $_GET[ 'settings-updated' ] ) ) === 'true' ) {
+        if ( is_admin() && isset( $_GET[ 'settings-updated' ] ) && sanitize_key( wp_unslash( $_GET[ 'settings-updated' ] ) ) === 'true' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $has_skip_link = $this->check_for_skip_link() ? 'yes' : 'no';
             update_option( $this->skip_link_option, $has_skip_link, false );
 
