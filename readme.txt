@@ -4,7 +4,7 @@ Tags: accessibility, alt text, screen reader, WCAG, a11y
 Requires at least: 5.9
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -54,7 +54,7 @@ High contrast requirements vary significantly depending on user needs and conten
 We recommend using our [website support forum](https://pluginrx.com/support/plugin/wcag-admin-accessibility-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/wcag-admin-accessibility-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 == Changelog ==
-= 1.0.3 = // TODO:
+= 1.0.3 =
 * Tweak: Console log full path of images without alt text to find hidden elements
 
 = 1.0.2 =
