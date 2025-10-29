@@ -54,6 +54,9 @@ High contrast requirements vary significantly depending on user needs and conten
 We recommend using our [website support forum](https://pluginrx.com/support/plugin/wcag-admin-accessibility-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/wcag-admin-accessibility-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 == Changelog ==
+= 1.0.3 = // TODO:
+* Tweak: Console log full path of images without alt text to find hidden elements
+
 = 1.0.2 =
 * Fixes: Prepare for deployment on WP.org repo
 

@@ -73,7 +73,7 @@ jQuery( $ => {
         // For the current checkbox, run check or remove accordingly
         if ( state ) {
             switch ( tool ) {
-                case 'alt-text': checkAltBubbles(); break;
+                case 'alt-text': checkAltBubbles( false, true ); break;
                 case 'contrast': checkColorContrast(); break;
                 case 'vague-link-text': checkVagueLinkTexts(); break;
                 case 'heading-hierarchy': checkHeadings(); break;
@@ -94,7 +94,7 @@ jQuery( $ => {
     /**
      * Image Alt Text
      */
-    function checkAltBubbles( countOnly = false ) {
+    function checkAltBubbles( countOnly = false, logInConsole = false ) {
         let count = 0;
 
         $( 'img' ).not( '#wpadminbar img' ).each( function() {
@@ -106,7 +106,18 @@ jQuery( $ => {
                     img.wrap( `<div class="wcagaat-missing-wrapper" data-label="⚠️ ${wcagaat_admin_bar.text.missing}"></div>` );
                 }
                 count++;
-                console.log( 'Missing alt text for image:', img[0] );
+                
+                if ( logInConsole ) {
+                    console.log( 'Missing alt text for image:', img[0] );
+                    const path = img.parents().map( function() {
+                        const el = $( this );
+                        let sel = el.prop( 'tagName' ).toLowerCase();
+                        if ( el.attr( 'id' ) ) sel += '#' + el.attr( 'id' );
+                        else if ( el.attr( 'class' ) ) sel += '.' + el.attr( 'class' ).split( /\s+/ )[0];
+                        return sel;
+                    } ).get().reverse().join( ' > ' );
+                    console.log( 'Path:', path );
+                }
             }
         } );
 
