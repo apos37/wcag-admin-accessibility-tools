@@ -4,63 +4,137 @@
  */
 
 
-/**
- * Define Namespaces
- */
-namespace Apos37\WCAGAdminAccessibilityTools;
-// use Apos37\WCAGAdminAccessibilityTools\Clear;
+namespace PluginRx\WCAGAdminAccessibilityTools;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * Exit if accessed directly.
- */
-if ( !defined( 'ABSPATH' ) ) exit;
-
-
-/**
- * Instantiate the class
- */
-add_action( 'init', function() {
-	(new Settings())->init();
-} );
-
-
-/**
- * The class
- */
 class Settings {
 
-    /**
-	 * The options group
-	 *
-	 * @var string
-	 */
-	private $group = WCAGAAT_TEXTDOMAIN;
-
 
     /**
-     * Default value link texts
+     * Default vague link phrases
      *
      * @var string
      */
-    public $vague_link_phrases = 'click here, read more, more info, learn more, details, here, more, info, link, see more, find out, read, go, continue, next, view, visit, download, watch, signup, register';
-    
+    public static $vague_link_phrases = 'click here, read more, more info, learn more, details, here, more, info, link, see more, find out, read, go, continue, next, view, visit, download, watch, signup, register';
+
+
+    /**
+	 * The option key
+	 *
+	 * @var string
+	 */
+	private const OPTION_NAME = 'wcagaat_settings';
+
+
+    /**
+     * The single instance of the class
+     *
+     * @var self|null
+     */
+    private static ?Settings $instance = null;
+
+
+    /**
+     * Internal cache to prevent multiple get_option calls
+     */
+    private static ?array $cached_settings = null;
+
+
+    /**
+     * Get the singleton instance
+     *
+     * @return self
+     */
+    public static function instance() : self {
+        return self::$instance ??= new self();
+    } // End instance()
+
 
     /**
      * Load on init
      */
-    public function init() {
-        
-		// Submenu
+    public function __construct() {
         add_action( 'admin_menu', [ $this, 'submenu' ] );
-
-		// Register the options
         add_action( 'admin_init', [  $this, 'register' ] );
-
-        // JQuery and CSS
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
+        add_action( 'wp_ajax_wcagaat_dismiss_deprecated_shortcode_notice', [ $this, 'ajax_dismiss_deprecated_shortcode_notice' ] );
+        add_action( 'admin_notices', [ $this, 'deprecated_shortcode_notice' ] );
+    } // End __construct()
 
-    } // End init()
+
+    /**
+     * Get a specific setting value with caching and defaults
+     * 
+     * @param string $key The specific metadata key to retrieve
+     * @param mixed $default Default value to return if key is not found
+     * @return mixed The value of the requested metadata key or default if not found
+     */
+    public static function get( $key, $default = null ) : mixed {
+        if ( null === self::$cached_settings ) {
+            $instance = self::instance();
+            $definitions = $instance->options( true );
+            
+            // 1. Try to get the new grouped settings
+            $saved = get_option( self::OPTION_NAME, null );
+            $needs_migration_save = false;
+
+            // 2. MIGRATION CHECK: If the new group doesn't exist, look for legacy keys
+            if ( null === $saved ) {
+                $saved = [];
+                foreach ( $definitions as $opt ) {
+                    $new_key = $opt[ 'key' ];
+                    $old_key = 'wcagaat_' . $new_key;
+
+                    // Check for the old individual option
+                    $old_value = get_option( $old_key, 'NOT_FOUND' );
+
+                    if ( 'NOT_FOUND' !== $old_value ) {
+                        $saved[ $new_key ] = $old_value;
+                        delete_option( $old_key );
+                        $needs_migration_save = true;
+                    }
+                }
+
+                // If we found legacy data, save the new grouped option immediately
+                if ( $needs_migration_save ) {
+                    update_option( self::OPTION_NAME, $saved );
+                }
+            }
+
+            // 3. Handle environmental/detected options (like the skip link check)
+            $saved[ 'skip_link_present' ] = get_option( 'wcagaat_skip_link_present', 'no' );
+
+            // 4. Map Defaults
+            $defaults = [];
+            foreach ( $definitions as $opt ) {
+                $defaults[ $opt[ 'key' ] ] = $opt[ 'default' ] ?? '';
+            }
+
+            self::$cached_settings = wp_parse_args( $saved, $defaults );
+        }
+
+        return self::$cached_settings[ $key ] ?? $default;
+    } // End get()
+
+
+    /**
+     * Check if assistant is enabled based on visibility setting
+     *
+     * @return bool
+     */
+    public static function is_assistant_enabled() : bool {
+        $visibility = sanitize_key( self::get( 'assistant_visibility' ) );
+        if ( ( $visibility === 'admins' && current_user_can( 'administrator' ) ) ||
+            ( $visibility === 'logged-in' && is_user_logged_in() ) ||
+            ( $visibility === 'everyone' ) ) {
+            
+            if ( self::get( 'tool_text_resizer' ) || self::get( 'tool_readable_font' ) || self::get( 'tool_modes' ) ) {
+                return true;
+            }
+        }
+        return false;
+    } // End is_assistant_enabled()
 
 
 	/**
@@ -71,10 +145,10 @@ class Settings {
     public function submenu() {
         add_submenu_page(
             'tools.php',
-            WCAGAAT_NAME . ' — ' . __( 'Settings', 'wcag-admin-accessibility-tools' ),
-            WCAGAAT_NAME,
+            Bootstrap::name() . ' — ' . __( 'Settings', 'wcag-admin-accessibility-tools' ),
+            Bootstrap::name(),
             'manage_options',
-            WCAGAAT__TEXTDOMAIN,
+            Bootstrap::textdomain(),
             [ $this, 'page' ]
         );
     } // End submenu()
@@ -87,7 +161,7 @@ class Settings {
      */
     public function page() {
         global $current_screen;
-        if ( $current_screen->id !== WCAGAAT_SETTINGS_SCREEN_ID ) {
+        if ( $current_screen->id !== 'tools_page_' . Bootstrap::textdomain() ) {
             return;
         }
         ?>
@@ -95,7 +169,7 @@ class Settings {
             <h1><?php echo esc_attr( get_admin_page_title() ) ?></h1>
 
 			<form method="post" action="options.php">
-				<?php settings_fields( $this->group ); ?>
+				<?php settings_fields( self::OPTION_NAME ); ?>
 				<div class="wcagaat-settings-wrapper">
 					<div class="wcagaat-box-sections">
 						<?php $this->sections(); ?>
@@ -127,7 +201,8 @@ class Settings {
             'forms'      => __( 'Forms', 'wcag-admin-accessibility-tools' ),
 			'images'     => __( 'Images', 'wcag-admin-accessibility-tools' ),
             'previewer'  => __( 'Previewer', 'wcag-admin-accessibility-tools' ),
-            'modes'      => __( 'Modes', 'wcag-admin-accessibility-tools' ),
+            'assistant'  => __( 'User Assistant', 'wcag-admin-accessibility-tools' ),
+            'data_mgmt'  => __( 'Data Management', 'wcag-admin-accessibility-tools' ),
 		];
 
 		// Iter the sections
@@ -136,12 +211,6 @@ class Settings {
 			<div class="wcagaat-box-row">
 				<div class="wcagaat-box-column">
 					<header class="wcagaat-box-header"><h2><?php echo esc_html( $title ); ?></h2></header>
-
-                    <?php if ( $key == 'modes' ) { ?>
-                        <p class="inst"><?php echo wp_kses_post( __( 'Modes include Dark Mode and Greyscale Mode. Enabling Dark Mode applies a few basic style adjustments automatically, such as background and text color on some standard elements. However, every theme is different, and you will likely need to write additional CSS to ensure your design works as intended. When Dark Mode is active, a <code>wcagaat-dark-mode</code> class is added to the <code>&lt;body&gt;</code> element. You can use this as a starting point for targeting specific elements. Additionally, any element with the <code>dark-mode</code> class will automatically receive a <code>#222222</code> background and <code>#ffffff</code> text color.', 'wcag-admin-accessibility-tools' ) ); ?></p>
-                        <p class="inst">Example CSS: <code>.wcagaat-dark-mode .element { background: #222222; color: #ffffff; }</code></p>
-                    <?php } ?>
-
 					<?php $this->fields( $key ); ?>
 				</div>
 			</div>
@@ -153,90 +222,100 @@ class Settings {
     /**
 	 * The options to register
 	 *
+	 * @param bool $data_only Whether to include only data without extra markup.
 	 * @return array
 	 */
-	public function options() {
-        // Check if the skip link is needed
-        $skip_link_needed = sanitize_key( get_option( 'wcagaat_skip_link_present', 'no' ) );
-        $warning = ( $skip_link_needed === 'yes' ) ? '<div class="wcagaat-warning">' . esc_html__( 'Warning: A skip link has already been detected in your theme or another plugin. Enabling this option may cause duplicate skip links.', 'wcag-admin-accessibility-tools' ) . '</div>' : '';
+	public function options( $data_only = false ) {
+        $skip_link_needed = get_option( 'wcagaat_skip_link_present', 'no' );
+        $warning = ( $skip_link_needed === 'yes' && ! $data_only ) ? '<div class="wcagaat-warning">' . esc_html__( 'Warning: A skip link has already been detected in your theme or another plugin. Enabling this option may cause duplicate skip links.', 'wcag-admin-accessibility-tools' ) . '</div>' : '';
 
         // Options
 		$options = [
             [
                 'section'   => 'structural',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_skip_link',
-                'title'     => __( 'Skip to Content Link', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a visually hidden "Skip to main content" link at the top of every page for improved keyboard navigation. Before enabling, please ensure this link has not already been added by your theme or a different plugin.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'skip_link',
+                'title'     => $data_only ? '' : __( 'Skip to Content Link', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds a visually hidden "Skip to main content" link at the top of every page for improved keyboard navigation. Before enabling, please ensure this link has not already been added by your theme or a different plugin.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
                 'comments'  => $warning,
             ],
             [
                 'section'   => 'forms',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_protected_password_eye',
-                'title'     => __( 'Display Password Eye for Page Passwords', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a "Show Password" toggle to password fields for improved accessibility.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'protected_password_eye',
+                'title'     => $data_only ? '' : __( 'Display Password Eye for Page Passwords', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds a "Show Password" toggle to password fields for improved accessibility.', 'wcag-admin-accessibility-tools' ),
                 'default'   => FALSE,
             ],
             [
                 'section'   => 'images',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_media_library_alt_text',
-                'title'     => __( 'Alt Text Column & Inline Editing', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a sortable Alt Text column to the Media Library list view. Alt text can be updated directly within the table.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'media_library_alt_text',
+                'title'     => $data_only ? '' : __( 'Alt Text Column & Inline Editing', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds a sortable Alt Text column to the Media Library list view. Alt text can be updated directly within the table.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
             ],
             [
                 'section'   => 'images',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_media_library_other_cols',
-                'title'     => __( 'Additional Media Columns', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds columns for Dimensions, MIME Type (e.g. image/png), and File Size to the Media Library list view.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'media_library_other_cols',
+                'title'     => $data_only ? '' : __( 'Additional Media Columns', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds columns for Dimensions, MIME Type (e.g. image/png), and File Size to the Media Library list view.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
             ],
             [
                 'section'   => 'previewer',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_admin_bar',
-                'title'     => __( 'Toolbar Toggles', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a menu to the admin bar on the front end with tools you can toggle to show errors on the page.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'admin_bar',
+                'title'     => $data_only ? '' : __( 'Toolbar Toggles', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds a menu to the admin bar on the front end with tools you can toggle to show errors on the page.', 'wcag-admin-accessibility-tools' ),
                 'default'   => TRUE,
             ],
             [
                 'section'   => 'previewer',
                 'type'      => 'checkbox',
-                'sanitize'  => 'sanitize_checkbox',
-                'key'       => 'wcagaat_contrast_aaa',
-                'title'     => __( 'Use WCAG AAA Color Contrast Compliance', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'When enabled, color contrast checks will enforce stricter AAA standards in addition to the default AA criteria, ensuring higher accessibility compliance on your site.', 'wcag-admin-accessibility-tools' ),
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'admin_bar_console',
+                'title'     => $data_only ? '' : __( 'Toolbar Console', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Console logs errors with color contrast and links missing underlines.', 'wcag-admin-accessibility-tools' ),
                 'default'   => FALSE,
-                'conditions' => [ 'wcagaat_admin_bar' ]
+                'conditions' => [ 'admin_bar' ]
+            ],
+            [
+                'section'   => 'previewer',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'contrast_aaa',
+                'title'     => $data_only ? '' : __( 'Use WCAG AAA Color Contrast Compliance', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'When enabled, color contrast checks will enforce stricter AAA standards in addition to the default AA criteria, ensuring higher accessibility compliance on your site.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
+                'conditions' => [ 'admin_bar' ]
             ],
             [
                 'section'   => 'previewer',
                 'type'      => 'textarea',
                 'sanitize'  => 'sanitize_textarea_field',
-                'key'       => 'wcagaat_meaningful_link_texts',
-                'title'     => __( 'Vague Link Texts', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Comma-separated list of vague or generic link texts to check for, e.g. "click here, read more, more info".', 'wcag-admin-accessibility-tools' ),
-                'default'   => $this->vague_link_phrases,
+                'key'       => 'meaningful_link_texts',
+                'title'     => $data_only ? '' : __( 'Vague Link Texts', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Comma-separated list of vague or generic link texts to check for, e.g. "click here, read more, more info".', 'wcag-admin-accessibility-tools' ),
+                'default'   => self::$vague_link_phrases,
                 'revert'    => TRUE,
-                'conditions'=> [ 'wcagaat_admin_bar' ],
+                'conditions'=> [ 'admin_bar' ],
             ],
             [
-                'section'   => 'modes',
+                'section'   => 'assistant',
                 'type'      => 'select',
                 'sanitize'  => 'sanitize_key',
-                'key'       => 'wcagaat_mode_visibility',
-                'title'     => __( 'Mode Visibility', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Controls who can see the mode switcher on the front end. Choose to limit visibility to administrators, logged-in users, or show it to everyone.', 'wcag-admin-accessibility-tools' ),
-                'options'   => [
+                'key'       => 'assistant_visibility',
+                'title'     => $data_only ? '' : __( 'Assistant Visibility', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Controls who can see the accessibility assistant on the front end. Choose to limit visibility to administrators, logged-in users, or show it to everyone.', 'wcag-admin-accessibility-tools' ),
+                'options'   => $data_only ? [] : [
                     ''          => __( 'Disabled', 'wcag-admin-accessibility-tools' ),
                     'admins'    => __( 'Administrators Only', 'wcag-admin-accessibility-tools' ),
                     'logged-in' => __( 'Logged-In Only', 'wcag-admin-accessibility-tools' ),
@@ -245,44 +324,156 @@ class Settings {
                 'default'   => '',
             ],
             [
-                'section'   => 'modes',
+                'section'   => 'assistant',
                 'type'      => 'select',
                 'sanitize'  => 'sanitize_key',
-                'key'       => 'wcagaat_modes',
-                'title'     => __( 'Mode Selector', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Adds a selector for switching to dark mode or greyscale mode.', 'wcag-admin-accessibility-tools' ),
-                'options'   => [
-                    'float'     => __( 'Floating Switch', 'wcag-admin-accessibility-tools' ),
-                    'nav'       => __( 'Navigation Menu', 'wcag-admin-accessibility-tools' ),
-                    'shortcode' => __( 'Shortcode [wcagaat_modes]', 'wcag-admin-accessibility-tools' ),
+                'key'       => 'assistant_location',
+                'title'     => $data_only ? '' : __( 'Assistant Location', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Select where the assistant button should appear.', 'wcag-admin-accessibility-tools' ),
+                'options'   => $data_only ? [] : [
+                    'float-left'  => __( 'Floating Switch (Bottom Left)', 'wcag-admin-accessibility-tools' ),
+                    'float-right' => __( 'Floating Switch (Bottom Right)', 'wcag-admin-accessibility-tools' ),
+                    'nav'         => __( 'Navigation Menu', 'wcag-admin-accessibility-tools' ),
+                    'shortcode'   => __( 'Shortcode [wcagaat_assistant]', 'wcag-admin-accessibility-tools' ),
                 ],
-                'default'   => 'float',
-                'conditions'=> [ 'wcagaat_mode_visibility' ],
+                'default'   => 'float-left',
+                'conditions'=> [ 'assistant_visibility' ],
             ],
             [
-                'section'   => 'modes',
-                'type'      => 'url',
-                'sanitize'  => 'sanitize_url',
-                'key'       => 'wcagaat_light_logo',
-                'title'     => __( 'Default Logo URL', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Optional. Provide the URL of a logo that should be replaced with the logo specified below when dark mode is enabled.', 'wcag-admin-accessibility-tools' ),
-                'default'   => '',
-                'conditions'=> [ 'wcagaat_mode_visibility' ],
+                'section'   => 'assistant',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'tool_text_resizer',
+                'title'     => $data_only ? '' : __( 'Tool: Text Resizer', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Includes buttons to increase or decrease text size within the assistant.', 'wcag-admin-accessibility-tools' ),
+                'default'   => TRUE,
+                'conditions'=> [ 'assistant_visibility' ],
             ],
             [
-                'section'   => 'modes',
+                'section'   => 'assistant',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'tool_readable_font',
+                'title'     => $data_only ? '' : __( 'Tool: Readable Font', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Includes a toggle to switch to a dyslexia-friendly system font stack.', 'wcag-admin-accessibility-tools' ),
+                'default'   => TRUE,
+                'conditions'=> [ 'assistant_visibility' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'tool_modes',
+                'title'     => $data_only ? '' : __( 'Tool: Modes', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Includes a dropdown to switch between different accessibility modes.', 'wcag-admin-accessibility-tools' ),
+                'default'   => TRUE,
+                'conditions'=> [ 'assistant_visibility' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'subsection',
+                'key'       => 'modes_divider',
+                'title'     => $data_only ? '' : __( 'Mode Options', 'wcag-admin-accessibility-tools' ),
+                'html'      => $data_only ? '' : '<p class="inst" >' . __( 'Modes include Dark Mode and Greyscale Mode. Enabling Dark Mode applies a few basic style adjustments automatically, such as background and text color on some standard elements. However, every theme is different, and you will likely need to write additional CSS to ensure your design works as intended. When Dark Mode is active, a <code>wcagaat-dark-mode</code> class is added to the <code>&lt;body&gt;</code> element. You can use this as a starting point for targeting specific elements. Additionally, any element with the <code>dark-mode</code> class will automatically receive a <code>#222222</code> background and <code>#ffffff</code> text color.', 'wcag-admin-accessibility-tools' ) . '</p>
+                <p class="inst">Example CSS: <code>.wcagaat-dark-mode .element { background: #222222; color: #ffffff; }</code></p>',
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'auto_detect_dark_mode',
+                'title'     => $data_only ? '' : __( 'Auto-Detect Device Dark Mode', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'If the user’s device is set to dark mode, a prompt will ask if they would like to enable dark mode for this site.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'text',
+                'sanitize'  => 'sanitize_text_field',
+                'key'       => 'mode_icon_default',
+                'title'     => $data_only ? '' : __( 'Default Mode Icon', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Only used if the modes tool is the only tool enabled.', 'wcag-admin-accessibility-tools' ),
+                'default'   => 'f185', // fa-sun
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'text',
+                'sanitize'  => 'sanitize_text_field',
+                'key'       => 'mode_icon_dark',
+                'title'     => $data_only ? '' : __( 'Dark Mode Icon', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Only used if the modes tool is the only tool enabled.', 'wcag-admin-accessibility-tools' ),
+                'default'   => 'f186', // fa-moon
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'text',
+                'sanitize'  => 'sanitize_text_field',
+                'key'       => 'mode_icon_greyscale',
+                'title'     => $data_only ? '' : __( 'Greyscale Mode Icon', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Only used if the modes tool is the only tool enabled.', 'wcag-admin-accessibility-tools' ),
+                'default'   => 'f042', // fa-circle-half-stroke
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
                 'type'      => 'url',
                 'sanitize'  => 'sanitize_url',
-                'key'       => 'wcagaat_dark_logo',
-                'title'     => __( 'Alternative Logo for Dark Mode', 'wcag-admin-accessibility-tools' ),
-                'desc'      => __( 'Optional. Provide the URL of a light-colored logo to be used automatically when dark mode is enabled.', 'wcag-admin-accessibility-tools' ),
+                'key'       => 'default_logo',
+                'title'     => $data_only ? '' : __( 'Default Logo URL', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Optional. Provide the URL of a logo that should be replaced with the logo specified below when dark mode is enabled.', 'wcag-admin-accessibility-tools' ),
                 'default'   => '',
-                'conditions'=> [ 'wcagaat_mode_visibility' ],
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
             ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'url',
+                'sanitize'  => 'sanitize_url',
+                'key'       => 'dark_logo',
+                'title'     => $data_only ? '' : __( 'Alternative Logo for Dark Mode', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Optional. Provide the URL of a light-colored logo to be used automatically when dark mode is enabled. You must include the default URL above so we know what to replace with this one.', 'wcag-admin-accessibility-tools' ),
+                'default'   => '',
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'assistant',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'disable_dark_mode_stylesheets',
+                'title'     => $data_only ? '' : __( 'Disable Dark Mode Stylesheets', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Disable the automatic loading of pre-filled stylesheets for dark mode.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
+                'conditions'=> [ 'assistant_visibility', 'tool_modes' ],
+            ],
+            [
+                'section'   => 'data_mgmt',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'uninstall_cleanup',
+                'title'     => $data_only ? '' : __( 'Remove Data on Uninstall', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Check this box to delete all user preferences and accessibility settings from the database when the plugin is deleted.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE
+            ]
         ];
 
         // Apply filter to allow developers to add custom fields
         $options = apply_filters( 'wcagaat_custom_settings', $options );
+
+        if ( $data_only ) {
+            $data = [];
+            foreach ( $options as $opt ) {
+                if ( isset( $opt[ 'key' ] ) ) {
+                    $data[] = [
+                        'key'       => $opt[ 'key' ],
+                        'default'   => $opt[ 'default' ] ?? null,
+                    ];
+                }
+            }
+            return $data;
+        }
 
         return $options;
 	} // End options()
@@ -294,11 +485,44 @@ class Settings {
 	 * @return array
 	 */
 	public function register() {
-		$options = $this->options();
-		foreach ( $options as $option ) {
-			register_setting( $this->group, $option[ 'key' ], $option[ 'sanitize' ] );
-		}
-	} // End register()
+        register_setting( self::OPTION_NAME, self::OPTION_NAME, [ $this, 'sanitize_all_settings' ] );
+    } // End register()
+
+
+    /**
+     * Sanitizes the entire array at once
+     * 
+     * @param array $input
+     * @return array
+     */
+    public function sanitize_all_settings( $input ) {
+        $output = [];
+        $definitions = $this->options();
+
+        foreach ( $definitions as $opt ) {
+            $key = $opt[ 'key' ];
+            
+            if ( ( $opt[ 'type' ] ?? '' ) === 'subsection' ) {
+                continue;
+            }
+
+            // Logic for checkboxes: if not in $input, it's unchecked (false)
+            if ( $opt[ 'type' ] === 'checkbox' ) {
+                $val = isset( $input[ $key ] ) ? $input[ $key ] : false;
+            } else {
+                $val = $input[ $key ] ?? $opt[ 'default' ];
+            }
+
+            // Check for callable (Works with [ $this, 'method' ] or 'global_func')
+            if ( isset( $opt[ 'sanitize' ] ) && is_callable( $opt[ 'sanitize' ] ) ) {
+                $output[ $key ] = call_user_func( $opt[ 'sanitize' ], $val );
+            } else {
+                $output[ $key ] = sanitize_text_field( $val );
+            }
+        }
+
+        return $output;
+    } // End sanitize_all_settings()
 
 
 	/**
@@ -313,44 +537,73 @@ class Settings {
 			if ( $option[ 'section' ] !== $section ) {
 				continue;
 			}
-
 			// Determine visibility based on conditions
 			$not_applicable = false;
-			if ( isset( $option[ 'conditions' ] ) && is_array( $option[ 'conditions' ] ) ) {
-				foreach ( $option[ 'conditions' ] as $condition_key ) {
-					$condition_option = array_filter( $options, fn( $opt ) => $opt[ 'key' ] === $condition_key );
-					$condition = reset( $condition_option );
-					$val = sanitize_text_field( get_option( $condition_key, $condition[ 'default' ] ?? '' ) );
-					if ( !filter_var( $val, FILTER_VALIDATE_BOOLEAN ) ) {
-						$not_applicable = true;
-						break;
-					}
-				}
-			}
+            if ( isset( $option[ 'conditions' ] ) && is_array( $option[ 'conditions' ] ) ) {
+                foreach ( $option[ 'conditions' ] as $condition_key ) {
+                    $val = self::get( $condition_key );
+                    
+                    if ( ! filter_var( $val, FILTER_VALIDATE_BOOLEAN ) ) {
+                        $not_applicable = true;
+                        break;
+                    }
+                }
+            }
 
-			$classes = 'wcagaat-box-content has-fields';
+			$classes = 'wcagaat-box-content';
 			if ( $not_applicable ) {
 				$classes .= ' not-applicable';
 			}
-			?>
-			<div class="<?php echo esc_attr( $classes ); ?>">
-				<div class="wcagaat-box-left">
-					<label for="<?php echo esc_html( $option[ 'key' ] ); ?>"><?php echo esc_html( $option[ 'title' ] ); ?></label>
-					<?php if ( isset( $option[ 'desc' ] ) ) { ?>
-						<p class="wcagaat-box-desc"><?php echo esc_html( $option[ 'desc' ] ); ?></p>
-					<?php } ?>
-				</div>
-				
-				<div class="wcagaat-box-right">
-					<?php
-					$add_field = 'settings_field_' . $option[ 'type' ];
-					$this->$add_field( $option );
-					?>
-				</div>
-			</div>
-			<?php
+
+            if ( $option[ 'type' ] === 'subsection' ) {
+                ?>
+                <div class="<?php echo esc_attr( $classes ); ?>">
+                    <div class="wcagaat-full-width">
+                        <?php $this->settings_field_subsection( $option ); ?>
+                    </div>
+                </div>
+                <?php
+            } else {
+                ?>
+                <div class="<?php echo esc_attr( $classes ); ?> has-fields">
+                    <div class="wcagaat-box-left">
+                        <label for="<?php echo esc_html( $option[ 'key' ] ); ?>"><?php echo esc_html( $option[ 'title' ] ); ?></label>
+                        <?php if ( isset( $option[ 'desc' ] ) ) { ?>
+                            <p class="wcagaat-box-desc"><?php echo esc_html( $option[ 'desc' ] ); ?></p>
+                        <?php } ?>
+                    </div>
+                    
+                    <div class="wcagaat-box-right">
+                        <?php
+                        $add_field = 'settings_field_' . $option[ 'type' ];
+                        if ( method_exists( $this, $add_field ) ) {
+                            $this->$add_field( $option );
+                        }
+                        ?>
+                    </div>
+                </div>
+                <?php
+            }
 		}
 	} // End fields()
+
+
+    /**
+     * Custom callback function to print a subsection divider with optional HTML content
+     *
+     * @param array $args
+     * @return void
+     */
+    public function settings_field_subsection( $args ) {
+        echo '<div id="' . esc_html( $args[ 'key' ] ) . '" class="wcagaat-subsection">';
+        if ( isset( $args[ 'title' ] ) ) {
+            echo '<h3>' . esc_html( $args[ 'title' ] ) . '</h3>';
+        }
+        if ( isset( $args[ 'html' ] ) ) {
+            echo wp_kses_post( $args[ 'html' ] );
+        }
+        echo '</div>';
+    } // End settings_field_subsection()
   
     
     /**
@@ -361,17 +614,12 @@ class Settings {
      */
     public function settings_field_text( $args ) {
         $width = isset( $args[ 'width' ] ) ? $args[ 'width' ] : '43rem';
-        $default = isset( $args[ 'default' ] )  ? $args[ 'default' ] : '';
-        $value = sanitize_text_field( get_option( $args[ 'key' ], $default ) );
-        if ( isset( $args[ 'revert' ] ) && $args[ 'revert' ] == true && trim( $value ) == '' ) {
-            $value = $default;
-        }
+        $value = sanitize_text_field( self::get( $args[ 'key' ] ) );
         $comments = isset( $args[ 'comments' ] ) ? '<br><p class="description">' . $args[ 'comments' ] . '</p>' : '';
 
         printf(
-            // Translators: %1$s is the input field id, %2$s is the input field name, %3$s is the current value of the field, %4$s is the CSS width, %5$s is comments HTML.
-            '<input type="text" id="%1$s" name="%2$s" value="%3$s" style="width: %4$s;" />%5$s',
-            esc_attr( $args[ 'key' ] ),
+            // Translators: %1$s is the input field id, %2$s is the current text value, %3$s is the CSS width, %4$s is comments HTML.
+            '<input type="text" id="%1$s" name="wcagaat_settings[%1$s]" value="%2$s" style="width: %3$s;" />%4$s',
             esc_attr( $args[ 'key' ] ),
             esc_html( $value ),
             esc_attr( $width ),
@@ -388,19 +636,12 @@ class Settings {
      */
     public function settings_field_url( $args ) {
         $width   = isset( $args[ 'width' ] ) ? $args[ 'width' ] : '43rem';
-        $default = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
-        $value   = esc_url( get_option( $args[ 'key' ], $default ) );
-
-        if ( isset( $args[ 'revert' ] ) && $args[ 'revert' ] === true && trim( $value ) === '' ) {
-            $value = esc_url( $default );
-        }
-
+        $value   = esc_url( self::get( $args[ 'key' ] ) );
         $comments = isset( $args[ 'comments' ] ) ? '<br><p class="description">' . $args[ 'comments' ] . '</p>' : '';
 
         printf(
-            // Translators: %1$s is the input field id, %2$s is the input field name, %3$s is the current URL value, %4$s is the CSS width, %5$s is comments HTML.
-            '<input type="url" id="%1$s" name="%2$s" value="%3$s" style="width: %4$s;" />%5$s',
-            esc_attr( $args[ 'key' ] ),
+            // Translators: %1$s is the input field id, %2$s is the current URL value, %3$s is the CSS width, %4$s is comments HTML.
+            '<input type="url" id="%1$s" name="wcagaat_settings[%1$s]" value="%2$s" style="width: %3$s;" />%4$s',
             esc_attr( $args[ 'key' ] ),
             esc_url( $value ),
             esc_attr( $width ),
@@ -418,17 +659,17 @@ class Settings {
     public function settings_field_textarea( $args ) {
         $width = isset( $args[ 'width' ] ) ? $args[ 'width' ] : '43rem';
         $height = isset( $args[ 'height' ] ) ? $args[ 'height' ] : '6rem';
-        $default = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
-        $value = sanitize_textarea_field( get_option( $args[ 'key' ], $default ) );
+        $value = sanitize_textarea_field( self::get( $args[ 'key' ] ) );
+
         if ( isset( $args[ 'revert' ] ) && $args[ 'revert' ] === true && trim( $value ) === '' ) {
-            $value = $default;
+            $value = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
         }
+
         $comments = isset( $args[ 'comments' ] ) ? '<br><p class="description">' . $args[ 'comments' ] . '</p>' : '';
 
         printf(
-            // Translators: %1$s is the textarea field id, %2$s is the textarea field name, %3$s is the CSS width, %4$s is the CSS height, %5$s is the current textarea value, %6$s is comments HTML.
-            '<textarea id="%1$s" name="%2$s" style="width: %3$s; height: %4$s;">%5$s</textarea>%6$s',
-            esc_attr( $args[ 'key' ] ),
+            // Translators: %1$s is the textarea field id, %2$s is the CSS width style, %3$s is the CSS height style, %4$s is the current textarea value, %5$s is comments HTML.
+            '<textarea id="%1$s" name="wcagaat_settings[%1$s]" style="width: %2$s; height: %3$s;">%4$s</textarea>%5$s',
             esc_attr( $args[ 'key' ] ),
             esc_attr( $width ),
             esc_attr( $height ),
@@ -445,13 +686,12 @@ class Settings {
      * @return void
      */
     public function settings_field_checkbox( $args ) {
-		$value = filter_var( get_option( $args[ 'key' ], $args[ 'default' ] ), FILTER_VALIDATE_BOOLEAN );
-		$id    = esc_attr( $args[ 'key' ] );
+		$value = filter_var( self::get( $args[ 'key' ] ), FILTER_VALIDATE_BOOLEAN );
 		$label = $value ? __( 'On', 'wcag-admin-accessibility-tools' ) : __( 'Off', 'wcag-admin-accessibility-tools' );
 
 		printf(
 			'<label class="wcagaat-toggle">
-				<input type="checkbox" id="%1$s" name="%1$s"%2$s />
+				<input type="checkbox" id="%1$s" name="wcagaat_settings[%1$s]"%2$s />
 				<span>
 					<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 						<path fill="none" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10"
@@ -464,7 +704,7 @@ class Settings {
 				</span>
 			</label>
             %4$s',
-			esc_attr( $id ),
+			esc_attr( $args[ 'key' ] ),
 			checked( $value, 1, false ),
 			esc_html( $label ),
 			wp_kses_post( isset( $args[ 'comments' ] ) ? $args[ 'comments' ] : '' )
@@ -492,17 +732,17 @@ class Settings {
     public function settings_field_select( $args ) {
         $width   = isset( $args[ 'width' ] ) ? $args[ 'width' ] : '20rem';
         $options = isset( $args[ 'options' ] ) ? $args[ 'options' ] : [];
-        $default = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
-        $value   = sanitize_key( get_option( $args[ 'key' ], $default ) );
+        $value   = sanitize_key( self::get( $args[ 'key' ] ) );
+        
         if ( isset( $args[ 'revert' ] ) && $args[ 'revert' ] === true && trim( $value ) === '' ) {
-            $value = $default;
+            $value = isset( $args[ 'default' ] ) ? $args[ 'default' ] : '';
         }
+        
         $comments = isset( $args[ 'comments' ] ) ? '<br><p class="description">' . $args[ 'comments' ] . '</p>' : '';
 
         printf(
-            // Translators: %1$s is the select field id, %2$s is the select field name, %3$s is the CSS width style, %4$s is the rendered <option> tags, %5$s is comments HTML.
-            '<select id="%1$s" name="%2$s" style="width: %3$s;">%4$s</select>%5$s',
-            esc_attr( $args[ 'key' ] ),
+            // Translators: %1$s is the select field id, %2$s is the CSS width style, %3$s is the rendered <option> tags, %4$s is comments HTML.
+            '<select id="%1$s" name="wcagaat_settings[%1$s]" style="width: %2$s;">%3$s</select>%4$s',
             esc_attr( $args[ 'key' ] ),
             esc_attr( $width ),
             wp_kses(
@@ -544,22 +784,32 @@ class Settings {
     /**
      * Enqueue
      *
+     * @param string $hook
      * @return void
      */
     public function enqueue( $hook ) {
-        // Check if we are on the correct admin page
-        if ( $hook !== WCAGAAT_SETTINGS_SCREEN_ID ) {
+        $script_version = Bootstrap::script_version();
+
+        // Dismiss notice AJAX
+		$handle = 'wcagaat_notice_dismissal';
+		wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/dismiss-notice.js' ), [ 'jquery' ], $script_version, true );
+		wp_localize_script( $handle, $handle, [
+			'nonce' => wp_create_nonce( 'wcagaat_dismiss_notice' ),
+		] );
+
+        // Settings page only
+        $text_domain = Bootstrap::textdomain();
+        if ( $hook !== 'tools_page_' . $text_domain ) {
             return;
         }
 
-        // Get the options
 		$options_with_conditions = array_values( array_filter( $this->options(), function( $option ) {
 			return isset( $option[ 'conditions' ] );
 		} ) );
 
 		// JS
 		$handle = 'wcagaat_settings';
-		wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'settings.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
+		wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/settings.js' ), [ 'jquery' ], $script_version, true );
 		wp_localize_script( $handle, $handle, [
 			'on'      => __( 'On', 'wcag-admin-accessibility-tools' ),
 			'off'     => __( 'Off', 'wcag-admin-accessibility-tools' ),
@@ -572,7 +822,45 @@ class Settings {
 		] );
 
 		// CSS
-		wp_enqueue_style( WCAGAAT_TEXTDOMAIN . '-settings', WCAGAAT_CSS_PATH . 'settings.css', [], WCAGAAT_SCRIPT_VERSION );
+		wp_enqueue_style( $text_domain . '-settings', Bootstrap::url( 'inc/css/settings.css' ), [], $script_version );
     } // End enqueue()
 
+
+    /**
+     * AJAX handler to dismiss deprecated shortcode notice
+     *
+     * @return void
+     */
+    public function ajax_dismiss_deprecated_shortcode_notice() {
+        check_ajax_referer( 'wcagaat_dismiss_notice', 'nonce' );
+        if ( current_user_can( 'manage_options' ) ) {
+            delete_option( 'wcagaat_deprecated_shortcode_used' );
+            wp_send_json_success();
+        } else {
+            wp_send_json_error( 'Unauthorized', 403 );
+        }
+    } // End ajax_dismiss_deprecated_shortcode_notice()
+
+
+    /**
+     * Deprecated shortcode notice
+     *
+     * @return void
+     */
+    public function deprecated_shortcode_notice() {
+        if ( get_option( 'wcagaat_deprecated_shortcode_used' ) && current_user_can( 'manage_options' ) ) {
+            ?>
+            <div id="wcagaat-deprecated-shortcode-notice" class="notice notice-warning is-dismissible">
+                <p>
+                    <strong><?php esc_html_e( 'WCAG Assistant Notice:', 'wcag-admin-accessibility-tools' ); ?></strong>
+                    <?php esc_html_e( 'The [wcagaat_modes] shortcode has been detected on your site. This tag is deprecated; please update your pages to use [wcagaat_assistant] instead.', 'wcag-admin-accessibility-tools' ); ?>
+                </p>
+            </div>
+            <?php
+        }
+    } // End deprecated_shortcode_notice()
+
 }
+
+
+Settings::instance();

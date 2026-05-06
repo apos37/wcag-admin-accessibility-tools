@@ -1,3 +1,12 @@
+/* Notices */
+.media-upload-form .notice, 
+.media-upload-form div.error, 
+.wrap .notice, 
+.wrap div.error, 
+.wrap div.updated {
+    margin: 5px 20px 15px 0;
+}
+
 /* Heading */
 .wrap h1 {
     margin: 1rem 0 !important;
@@ -51,7 +60,7 @@
     white-space: nowrap;
 }
 
-.wcagaat-box-column .inst {
+.wcagaat-box-column .inst:not(.wcagaat-subsection .inst) {
     margin: 1.5em;
 }
 

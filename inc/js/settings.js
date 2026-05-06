@@ -26,7 +26,7 @@
 
 			$( '.wcagaat-box-content' ).each( function() {
 				const fieldEl = $( this );
-				const inputEl = fieldEl.find( 'input[id], select[id], textarea[id]' ).first();
+				const inputEl = fieldEl.find( 'input[id], select[id], textarea[id], .wcagaat-subsection[id]' ).first();
 				const optionKey = inputEl.attr( 'id' );
 
 				const optionData = options.find( function( o ) { return o.key === optionKey; } );

@@ -1,0 +1,110 @@
+/* Container & Wrapper Alignment */
+.wcagaat-assistant-menu-item {
+    display: flex !important;
+    align-items: center !important;
+    list-style: none !important;
+    background: none !important;
+}
+
+.wcagaat-nav-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 0 0 10px;
+}
+
+/* Neutralize Floating/Fixed Styles */
+.wcagaat-assistant-menu-item #wcagaat-assistant-container {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    z-index: 100;
+}
+
+.wcagaat-assistant-menu-item .wcagaat-solo-tool {
+    position: relative !important;
+    line-height: 1 !important; /* Kill theme-inherited line height */
+    flex-shrink: 0 !important; /* Prevent the nav from squishing it */
+    overflow: hidden; /* Ensures nothing bleeds out to stretch it */
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+}
+
+/* Assistant Panel Dropdown Alignment */
+.wcagaat-assistant-menu-item #wcagaat-assistant-panel {
+    position: absolute !important;
+    bottom: auto !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    margin-top: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2) !important;
+    transform: none !important;
+}
+
+.wcagaat-assistant-menu-item #wcagaat-text-resizer-solo button {
+    font-size: 18px !important;
+    transform: translateY(-1px) !important;
+}
+
+#wcagaat-mode-switch .wcagaat-mode {
+    transform: translateY(1px) !important;
+}
+
+/* Flip Tooltips Pointing DOWN */
+.wcagaat-assistant-menu-item .wcagaat-tooltip {
+    bottom: auto !important;
+    top: calc( 100% + 15px ) !important;
+    left: 50% !important;
+    transform: translateX( -50% ) translateY( -5px ) !important;
+}
+
+/* Flip Arrow to Top of Tooltip */
+.wcagaat-assistant-menu-item .wcagaat-tooltip:after {
+    top: auto !important;
+    bottom: 100% !important;
+    left: 50% !important;
+    margin-left: -5px !important;
+    border-color: transparent transparent #222 transparent !important;
+}
+
+/* Animation Reset for Nav Tooltip */
+.wcagaat-assistant-menu-item .wcagaat-solo-tool:hover .wcagaat-tooltip {
+    transform: translateX( -50% ) translateY( 0 ) !important;
+}
+
+/* Remove the default focus box/outline */
+.wcagaat-assistant-menu-item button:focus,
+.wcagaat-assistant-menu-item a:focus,
+.wcagaat-assistant-menu-item #wcagaat-assistant-trigger:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Add a subtle, clean focus state (Accessibility requirement) */
+/* This ensures keyboard users still see where they are without the "box" */
+.wcagaat-assistant-menu-item button:focus-visible,
+.wcagaat-assistant-menu-item #wcagaat-assistant-trigger:focus-visible {
+    outline: 2px solid #007cba !important; /* Standard WP Blue or your brand color */
+    outline-offset: 2px;
+    border-radius: 50%; /* Keeps it circular */
+}
+
+/* If the theme is wrapping the <li> in a focusable container */
+.wcagaat-assistant-menu-item:focus-within {
+    outline: none !important;
+}
+
+/* Reset for the navigation wrapper inside the list item */
+.wcagaat-nav-wrapper:focus,
+.wcagaat-nav-wrapper:active {
+    outline: none !important;
+    border: none !important;
+}

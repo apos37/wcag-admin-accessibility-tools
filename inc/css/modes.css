@@ -2,11 +2,11 @@
 #wcagaat-mode-switch {
 	background-color: #111;
 	width: 40px;
-	height: 40px;
+	height: 37px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 50px;
+	border-radius: 50%;
 	box-shadow: 2px 2px 10px 0 rgba(0, 2, 0, 0.4);
 	padding: 5px;
 	box-sizing: border-box;
@@ -18,7 +18,7 @@
 	height: 100% !important;
 	background: none !important;
 	border: none !important;
-	font-size: 1.2rem !important;
+	font-size: 20px !important;
 	display: flex !important;
 	align-items: center !important;
 	justify-content: center !important;
@@ -40,13 +40,117 @@
 }
 
 /* Float */
-#wcagaat-mode-switch[data-type="float"] {
+#wcagaat-mode-switch[data-location^="float-"] {
 	position: fixed;
-	bottom: 1rem;
-	left: 1rem;
+	bottom: 20px;
 	z-index: 9999;
 }
 
-#wcagaat-mode-switch[data-type="float"] button i.wcagaat-mode {
-	line-height: 1;
+#wcagaat-mode-switch[data-location="float-left"] {
+	left: 20px;
+}
+
+#wcagaat-mode-switch[data-location="float-right"] {
+	right: 20px;
+}
+
+#wcagaat-mode-switch[data-location^="float-"] button i.wcagaat-mode {
+	line-height: 0 !important;
+}
+
+#wcagaat-mode-switch[data-location^="float-"][data-current="dark"] {
+    box-shadow: 0 2px 10px 0 #ffffff;
+}
+
+/* Dark Mode Prompt */
+
+#wcagaat-dark-mode-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-content {
+    position: relative;
+    background: #222222;
+    color: white;
+    width: min(420px, 90vw);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    z-index: 1;
+    font-family: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#wcagaat-dark-mode-title {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #3dcbdb;
+}
+
+#wcagaat-dark-mode-modal p {
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: white;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+#wcagaat-dark-mode-modal button {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.05s ease, border-color 0.15s ease;
+    background: #111;
+    color: white;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-yes {
+    background: #1f6feb;
+    border-color: #1f6feb;
+    color: #fff;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-yes:hover {
+    background: #1857b6;
+    border-color: #1857b6;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-no {
+    background: #111;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+#wcagaat-dark-mode-modal .wcagaat-dark-mode-no:hover {
+    border-color: #3dcbdb;
+    color: #3dcbdb;
+}
+
+#wcagaat-dark-mode-modal button:active {
+    transform: scale(0.98);
+}
+
+#wcagaat-dark-mode-modal button:focus {
+    outline: 2px solid #3dcbdb;
+    outline-offset: 2px;
 }

@@ -3,32 +3,12 @@
  * Admin bar
  */
 
+namespace PluginRx\WCAGAdminAccessibilityTools;
 
-/**
- * Define Namespaces
- */
-namespace Apos37\WCAGAdminAccessibilityTools;
-use Apos37\WCAGAdminAccessibilityTools\Settings;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-/**
- * Exit if accessed directly.
- */
-if ( !defined( 'ABSPATH' ) ) exit;
-
-
-/**
- * Instantiate the class
- */
-add_action( 'init', function() {
-	(new AdminBar())->init();
-} );
-
-
-/**
- * The class
- */
 class AdminBar {
+
 
     /**
      * The dashicon for the admin bar menu
@@ -43,42 +23,56 @@ class AdminBar {
      *
      * @var string
      */
-    private $nonce_alt_text = 'media_library_alt_text';
+    // private $nonce = 'admin_bar_nonce';
+
+
+    /**
+     * The single instance of the class
+     *
+     * @var self|null
+     */
+    private static ?AdminBar $instance = null;
+
+
+    /**
+     * Get the singleton instance
+     *
+     * @return self
+     */
+    public static function instance() : self {
+        return self::$instance ??= new self();
+    } // End instance()
 
 
     /**
      * Load on init
      */
-    public function init() {
-        
-        // Add admin bar menu button
+    public function __construct() {
 		add_action( 'admin_bar_menu', [ $this, 'menu' ], 100 );
-
-        // Enqueue scripts
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-
-    } // End init()
+    } // End __construct()
 
 
     /**
      * Add a button to the admin bar
      * 
+     * @param \WP_Admin_Bar $wp_admin_bar The admin bar object
      * @return void
      */
     public function menu( $wp_admin_bar ) {
-        if ( !current_user_can( 'manage_options' ) || is_admin() ) {
+        if ( ! current_user_can( 'manage_options' ) || is_admin() || ! filter_var( Settings::get( 'admin_bar' ), FILTER_VALIDATE_BOOLEAN ) ) {
             return;
         }
 
         // The main toolbar menu item
         $wp_admin_bar->add_node( [
             'id'    => 'wcagaat',
-            'title' => '<span class="ab-icon dashicons ' . esc_attr( $this->dashicon ) . '" title="' . esc_attr( WCAGAAT_NAME ) . '"></span><span class="ab-label">' . __( 'A11y Tools ', 'wcag-admin-accessibility-tools' ) . '</span>',
+            'title' => '<span class="ab-icon dashicons ' . esc_attr( $this->dashicon ) . '" title="' . esc_attr( Bootstrap::name() ) . '"></span><span class="ab-label">' . __( 'A11y Tools ', 'wcag-admin-accessibility-tools' ) . '</span>',
             'href'  => false,
         ] );
 
         // AA or AAA for color contrast
-        $aa_or_aaa = filter_var( get_option( 'wcagaat_contrast_aaa' ), FILTER_VALIDATE_BOOLEAN ) ? 'AAA' : 'AA';
+        $aa_or_aaa = filter_var( Settings::get( 'contrast_aaa' ), FILTER_VALIDATE_BOOLEAN ) ? 'AAA' : 'AA';
 
         // The tools in the dropdown
         $tools = [
@@ -121,18 +115,19 @@ class AdminBar {
      * @return void
      */
     public function enqueue_scripts() {
-        if ( !current_user_can( 'administrator' ) || is_admin() ) {
+        if ( ! current_user_can( 'administrator' ) || is_admin() || ! filter_var( Settings::get( 'admin_bar' ), FILTER_VALIDATE_BOOLEAN ) ) {
             return;
         }
 
 		$handle = 'wcagaat_admin_bar';
         wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'admin-bar.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
+		wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/admin-bar.js' ), [ 'jquery' ], Bootstrap::script_version(), true );
 		wp_localize_script( $handle, $handle, [
-            'ajaxurl'         => admin_url( 'admin-ajax.php' ),
-            'nonce'           => wp_create_nonce( $this->nonce_alt_text ),
-            'doing_aaa'       => filter_var( get_option( 'wcagaat_contrast_aaa' ), FILTER_VALIDATE_BOOLEAN ),
-            'vague_link_text' => sanitize_textarea_field( get_option( 'wcagaat_meaningful_link_texts', (new Settings())->vague_link_phrases ) ),
+            // 'ajaxurl'         => admin_url( 'admin-ajax.php' ),
+            // 'nonce'           => wp_create_nonce( $this->nonce ),
+            'doing_aaa'       => filter_var( Settings::get( 'contrast_aaa' ), FILTER_VALIDATE_BOOLEAN ),
+            'doing_console'   => filter_var( Settings::get( 'admin_bar_console' ), FILTER_VALIDATE_BOOLEAN ),
+            'vague_link_text' => sanitize_textarea_field( Settings::get( 'meaningful_link_texts', Settings::$vague_link_phrases ) ),
             'text'            => [
                 'edit'    => __( 'Edit', 'wcag-admin-accessibility-tools' ),
                 'update'  => __( 'Update', 'wcag-admin-accessibility-tools' ),
@@ -140,6 +135,10 @@ class AdminBar {
                 'total'   => __( 'Total Issues Found', 'wcag-admin-accessibility-tools' ),
             ]
         ] );
-		wp_enqueue_style( WCAGAAT_TEXTDOMAIN . '-admin-bar', WCAGAAT_CSS_PATH . 'admin-bar.css', [], WCAGAAT_SCRIPT_VERSION );
+
+		wp_enqueue_style( Bootstrap::textdomain() . '-admin-bar', Bootstrap::url( 'inc/css/admin-bar.css' ), [], Bootstrap::script_version() );
     } // End enqueue_scripts()
 }
+
+
+AdminBar::instance();

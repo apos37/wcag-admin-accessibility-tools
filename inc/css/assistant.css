@@ -1,0 +1,184 @@
+/* Container & Trigger */
+#wcagaat-assistant-container {
+    position: fixed;
+    z-index: 999999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    line-height: 1.5;
+}
+
+#wcagaat-assistant-trigger {
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    background-color: #007cba; /* WordPress Blue */
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    padding: 0;
+}
+
+#wcagaat-assistant-trigger:hover {
+    transform: scale(1.1);
+    background-color: #006799;
+}
+
+/* Positioning Logic */
+#wcagaat-assistant-container[data-location="float-left"] { bottom: 20px; left: 20px; }
+#wcagaat-assistant-container[data-location="float-right"] { bottom: 20px; right: 20px; }
+
+/* The Panel */
+#wcagaat-assistant-panel {
+    position: absolute;
+    width: 280px;
+    background-color: #ffffff;
+    color: #222222;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    border: 1px solid #dddddd;
+}
+
+/* Adjust panel position based on trigger location */
+#wcagaat-assistant-container[data-location^="float-left"] #wcagaat-assistant-panel { left: 0; bottom: calc(100% + 15px); }
+#wcagaat-assistant-container[data-location^="float-right"] #wcagaat-assistant-panel { right: 0; bottom: calc(100% + 15px); }
+
+/* Header & Rows */
+.wcagaat-panel-header {
+    display: block;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.wcagaat-tool {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.wcagaat-tool:last-child {
+    margin-bottom: 0;
+}
+
+.wcagaat-tool-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Inputs & Buttons */
+.wcagaat-button-group {
+    display: flex;
+    gap: 6px;
+}
+
+.wcagaat-text-resizer-button {
+    font-size: 25px !important;
+}
+
+#wcagaat-assistant-panel button, 
+#wcagaat-assistant-panel select {
+    background-color: #f6f7f7;
+    border: 1px solid #dcdcde;
+    color: #2c3338;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1;
+    height: 30px;
+    cursor: pointer;
+    transition: border-color 0.1s linear, background-color 0.1s linear;
+}
+
+#wcagaat-assistant-panel button:hover {
+    background-color: #f0f0f1;
+    border-color: #8c8f94;
+}
+
+#wcagaat-assistant-panel button[data-state="on"] {
+    background-color: #007cba;
+    color: #ffffff;
+    border-color: #007cba;
+}
+
+#wcagaat-assistant-panel select {
+    margin-bottom: 0 !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    #wcagaat-assistant-panel {
+        width: calc(100vw - 40px);
+        max-width: 300px;
+    }
+}
+
+/* Dyslexia / Readable Font Stack */
+body.wcagaat-readable-font {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+}
+
+body.wcagaat-readable-font *:not(
+    #wpadminbar, 
+    #wpadminbar *,
+    #wcagaat-assistant-container, 
+    #wcagaat-assistant-container *, 
+    .fa, .fas, .far, .fa-classic, .fa-regular, .fa-solid, .fa-light, .fa-duotone, .fa-brands, .x-icon, .x-anchor-sub-indicator
+) {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+}
+
+/* Reset Button */
+#wcagaat-assistant-reset {
+    font-size: 10px;
+    float: right;
+    text-transform: uppercase;
+    color: red;
+    font-weight: 500;
+}
+
+/* Reset Spinner */
+
+#wcagaat-assistant-reset .wcagaat-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 6px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: wcagaat-spin 0.7s linear infinite;
+    vertical-align: -0.15em;
+}
+
+@keyframes wcagaat-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#wcagaat-assistant-reset .wcagaat-btn-icon,
+#wcagaat-assistant-reset .wcagaat-status-text {
+    display: inline-block;
+}
+
+#wcagaat-assistant-reset .wcagaat-btn-icon {
+    margin-right: 6px;
+}
+
+#wcagaat-assistant-reset.is-saving {
+    text-decoration: none !important;
+    pointer-events: none;
+    cursor: wait;
+}

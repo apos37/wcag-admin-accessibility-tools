@@ -1,0 +1,86 @@
+/* Container & Wrapper Alignment for Shortcode */
+.wcagaat-shortcode-wrapper {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin: 5px;
+}
+
+/* Neutralize Floating/Fixed Styles */
+#wcagaat-assistant-container[data-location="shortcode"],
+.wcagaat-solo-tool[data-location="shortcode"] {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: 10;
+    float: none !important;
+}
+
+/* Ensure perfect circular shape for solo tools */
+.wcagaat-solo-tool[data-location="shortcode"] {
+    display: flex !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    overflow: visible; /* Allow tooltips to show */
+    min-height: 40px !important;
+    max-height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+}
+
+/* Fix font and alignment for resizer buttons */
+.wcagaat-solo-tool[data-location="shortcode"] button {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+
+#wcagaat-mode-switch[data-location="shortcode"] .wcagaat-mode {
+    transform: translateY(1px) translateX(1px) !important;
+}
+
+/* Assistant Panel Dropdown Alignment for Shortcode */
+#wcagaat-assistant-container[data-location="shortcode"] #wcagaat-assistant-panel {
+    position: absolute !important;
+    bottom: auto !important;
+    top: calc(100% + 10px) !important;
+    left: 0 !important;
+    right: auto !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2) !important;
+    transform: none !important;
+}
+
+/* Tooltip Adjustments (Point UP by default in content) */
+.wcagaat-solo-tool[data-location="shortcode"] .wcagaat-tooltip {
+    bottom: calc(100% + 12px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(5px) !important;
+}
+
+.wcagaat-solo-tool[data-location="shortcode"] .wcagaat-tooltip:after {
+    top: 100% !important;
+    left: 50% !important;
+    margin-left: -5px !important;
+    border-color: #222 transparent transparent transparent !important;
+}
+
+/* Hover Animation for Shortcode Tooltip */
+.wcagaat-solo-tool[data-location="shortcode"]:hover .wcagaat-tooltip {
+    transform: translateX(-50%) translateY(0) !important;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Accessibility Focus States */
+.wcagaat-solo-tool[data-location="shortcode"] button:focus-visible,
+#wcagaat-assistant-trigger[data-location="shortcode"]:focus-visible,
+#wcagaat-mode-switch[data-location="shortcode"] #wcagaat-mode-toggle:focus-visible,
+.wcagaat-solo-tool[data-location="shortcode"] button:focus,
+#wcagaat-assistant-trigger[data-location="shortcode"]:focus,
+#wcagaat-mode-switch[data-location="shortcode"] #wcagaat-mode-toggle:focus {
+    outline: 2px solid #007cba !important;
+    outline-offset: 2px;
+    border-radius: 50%;
+}

@@ -1,5 +1,5 @@
 jQuery( $ => {
-	console.log( 'Modes JS Loaded...' );
+	// console.log( 'Modes JS Loaded...' );
 
 	let currentMode = wcagaat_modes.current_mode;
 	const modes = wcagaat_modes.modes;

@@ -108,6 +108,7 @@ jQuery( $ => {
                 count++;
                 
                 if ( logInConsole ) {
+                    if ( ! wcagaat_admin_bar.doing_console ) return;
                     console.log( 'Missing alt text for image:', img[0] );
                     const path = img.parents().map( function() {
                         const el = $( this );
@@ -181,7 +182,9 @@ jQuery( $ => {
                     return;
                 }
 
-                console.log( 'Color Contrast Issue:', $el[0], ' | Foreground:', fg, ' | Background:', bg );
+                if ( wcagaat_admin_bar.doing_console ) {
+                    console.log( 'Color Contrast Issue:', $el[0], ' | Foreground:', fg, ' | Background:', bg );
+                }
 
                 if ( !countOnly ) {
 
@@ -421,9 +424,9 @@ jQuery( $ => {
             const link = this;
             const $link = $( link );
 
-            // Ignore this link if it has more than one span or any div
-            const $spans = $link.children( 'span' );
-            const $divs = $link.children( 'div' );
+            // Ignore this link if it has more than one span or any div, article, or figure
+            const $spans = $link.find( 'span' );
+            const $divs = $link.find( 'div, article, figure' );
             if ( $spans.length > 1 || $divs.length > 0 ) {
                 return; 
             }
@@ -449,7 +452,9 @@ jQuery( $ => {
             const decoration = computed.textDecorationLine || computed.textDecoration;
 
             if ( decoration !== 'underline' && !looksLikeButton( computed ) ) {
-                console.log( 'Link missing underline:', link );
+                if ( wcagaat_admin_bar.doing_console ) {
+                    console.log( 'Link missing underline:', link );
+                }
                 count++;
 
                 if ( !countOnly && !$link.hasClass( 'wcagaat-underline-issue' ) ) {

@@ -3,10 +3,10 @@
  * Plugin Name:         WCAG Admin Accessibility Tools
  * Plugin URI:          https://pluginrx.com/plugin/wcag-admin-accessibility-tools/
  * Description:         Admin-side accessibility enhancements and tools to assist with WCAG compliance.
- * Version:             1.0.3
- * Requires at least:   5.9
- * Tested up to:        6.8
- * Requires PHP:        7.4
+ * Version:             1.2.0
+ * Requires at least:   6.0
+ * Tested up to:        6.9
+ * Requires PHP:        8.0
  * Author:              PluginRx
  * Author URI:          https://pluginrx.com/
  * Discord URI:         https://discord.gg/3HnzNEJVnR
@@ -17,75 +17,309 @@
  */
 
 
-/**
- * Define Namespace
- */
-namespace Apos37\WCAGAdminAccessibilityTools;
+namespace PluginRx\WCAGAdminAccessibilityTools;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 /**
- * Exit if accessed directly.
+ * BOOTSTRAP
+ *
+ * Loads plugin metadata, performs environment checks, and initializes the plugin.
  */
-if ( !defined( 'ABSPATH' ) ) exit;
+final class Bootstrap {
+
+    /**
+     * Plugin files to load
+     */
+    public const FILES = [
+        'integrations.php',
+        'settings.php',
+        'structural.php',
+        'assistant.php',
+    ];
 
 
-/**
- * Defines
- */
-$plugin_data = get_file_data( __FILE__, [
-    'name'         => 'Plugin Name',
-    'version'      => 'Version',
-    'plugin_uri'   => 'Plugin URI',
-    'requires_php' => 'Requires PHP',
-    'textdomain'   => 'Text Domain',
-    'author'       => 'Author',
-    'author_uri'   => 'Author URI',
-    'discord_uri'  => 'Discord URI'
-] );
-
-// Versions
-define( 'WCAGAAT_VERSION', $plugin_data[ 'version' ] );
-define( 'WCAGAAT_SCRIPT_VERSION', time() );                                                 // TODO: REPLACE WITH time() DURING TESTING
-define( 'WCAGAAT_MIN_PHP_VERSION', $plugin_data[ 'requires_php' ] );
-
-// Names
-define( 'WCAGAAT_NAME', $plugin_data[ 'name' ] );
-define( 'WCAGAAT_TEXTDOMAIN', $plugin_data[ 'textdomain' ] );
-define( 'WCAGAAT__TEXTDOMAIN', str_replace( '-', '_', WCAGAAT_TEXTDOMAIN ) );
-define( 'WCAGAAT_AUTHOR', $plugin_data[ 'author' ] );
-define( 'WCAGAAT_AUTHOR_URI', $plugin_data[ 'author_uri' ] );
-define( 'WCAGAAT_PLUGIN_URI', $plugin_data[ 'plugin_uri' ] );
-define( 'WCAGAAT_GUIDE_URL', WCAGAAT_AUTHOR_URI . 'guide/plugin/' . WCAGAAT_TEXTDOMAIN . '/' );
-define( 'WCAGAAT_DOCS_URL', WCAGAAT_AUTHOR_URI . 'docs/plugin/' . WCAGAAT_TEXTDOMAIN . '/' );
-define( 'WCAGAAT_SUPPORT_URL', WCAGAAT_AUTHOR_URI . 'support/plugin/' . WCAGAAT_TEXTDOMAIN . '/' );
-define( 'WCAGAAT_DISCORD_URL', $plugin_data[ 'discord_uri' ] );
-
-// Paths
-define( 'WCAGAAT_BASENAME', plugin_basename( __FILE__ ) );                                          //: text-domain/text-domain.php
-define( 'WCAGAAT_ABSPATH', plugin_dir_path( __FILE__ ) );                                           //: /home/.../public_html/wp-content/plugins/text-domain/
-define( 'WCAGAAT_DIR', plugin_dir_url( __FILE__ ) );                                                //: https://domain.com/wp-content/plugins/text-domain/
-define( 'WCAGAAT_INCLUDES_ABSPATH', WCAGAAT_ABSPATH . 'inc/' );                                     //: /home/.../public_html/wp-content/plugins/text-domain/inc/
-define( 'WCAGAAT_INCLUDES_DIR', WCAGAAT_DIR . 'inc/' );                                             //: https://domain.com/wp-content/plugins/text-domain/inc/
-define( 'WCAGAAT_JS_PATH', WCAGAAT_INCLUDES_DIR . 'js/' );                                          //: https://domain.com/wp-content/plugins/text-domain/inc/js/
-define( 'WCAGAAT_CSS_PATH', WCAGAAT_INCLUDES_DIR . 'css/' );                                        //: https://domain.com/wp-content/plugins/text-domain/inc/css/
-define( 'WCAGAAT_SETTINGS_PATH', admin_url( 'tools.php?page=' . WCAGAAT__TEXTDOMAIN ) );            //: https://domain.com/wp-admin/tools.php?page=text-domain
-
-// Screen IDs
-define( 'WCAGAAT_SETTINGS_SCREEN_ID', 'tools_page_' . WCAGAAT__TEXTDOMAIN );
+    /**
+     * Front-end files
+     */
+    public const FRONT_END_FILES = [
+        'admin-bar.php',
+        'forms.php',
+    ];
 
 
-/**
- * Includes
- */
-require_once WCAGAAT_INCLUDES_ABSPATH . 'common.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'helpers.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'integrations.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'settings.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'media-library.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'structural.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'modes.php';
-require_once WCAGAAT_INCLUDES_ABSPATH . 'forms.php';
+    /**
+     * Admin-only files
+     */
+    public const ADMIN_FILES = [
+        'media-library.php',
+        'plugins-page.php',
+    ];
 
-if ( get_option( 'wcagaat_frontend_tools', true ) ) {
-    require_once WCAGAAT_INCLUDES_ABSPATH . 'admin-bar.php';
+
+    /**
+     * Plugin header keys
+     */
+    public const HEADER_KEYS = [
+        'name'         => 'Plugin Name',
+        'description'  => 'Description',
+        'version'      => 'Version',
+        'plugin_uri'   => 'Plugin URI',
+        'requires_php' => 'Requires PHP',
+        'textdomain'   => 'Text Domain',
+        'author'       => 'Author',
+        'author_uri'   => 'Author URI',
+        'discord_uri'  => 'Discord URI'
+    ];
+
+
+    /**
+     * Plugin metadata
+     */
+    private array $meta;
+
+
+    /**
+     * Singleton instance
+     */
+    private static ?Bootstrap $instance = null;
+
+
+    /**
+     * Get instance
+     */
+    public static function instance() : self {
+        return self::$instance ??= new self();
+    } // End instance()
+
+
+    /**
+     * Constructor
+     */
+    private function __construct() {
+        $this->meta = $this->load_meta();
+        add_action( 'doing_it_wrong_run', [ $this, 'trace_translation_errors' ] );
+        add_action( 'plugins_loaded', [ $this, 'load_files' ] );
+    } // End __construct()
+
+
+    /**
+     * Check if test mode is enabled
+     *
+     * @return bool
+     */
+    public static function is_test_mode() : bool {
+        return filter_var( apply_filters( 'wcagaat_test_mode', get_option( 'ddtt_test_mode' ) ), FILTER_VALIDATE_BOOLEAN );
+    } // End is_test_mode()
+
+
+    /**
+     * Load plugin metadata
+     */
+    private function load_meta() : array {
+        return get_file_data( __FILE__, self::HEADER_KEYS );
+    } // End load_meta()
+
+
+    /**
+     * Trace translation errors
+     *
+     * This method is hooked to 'doing_it_wrong_run' to log backtraces when early translation functions are called.
+     *
+     * @param string $function_name The name of the function being called.
+     */
+    public function trace_translation_errors( $function_name ) : void {
+        if ( self::is_test_mode() && '_load_textdomain_just_in_time' === $function_name ) {
+            error_log( '--- PHP BACKTRACE: EARLY TRANSLATION DETECTED ---' );
+            
+            // Generates a readable stack trace in your debug.log
+            error_log( ( new \Exception() )->getTraceAsString() );
+        }
+    } // End trace_translation_errors()
+
+
+    /**
+     * Environment checks
+     */
+    private function check_environment() : void {
+        if ( version_compare( PHP_VERSION, $this->meta[ 'requires_php' ], '<' ) ) {
+            deactivate_plugins( plugin_basename( __FILE__ ) );
+            wp_die( sprintf(
+                /* translators: %1$s is plugin name, %2$s is required PHP version */
+                esc_html( __( '%1$s requires PHP %2$s or higher.', 'wcag-admin-accessibility-tools' ) ),
+                esc_html( $this->meta[ 'name' ] ),
+                esc_html( $this->meta[ 'requires_php' ] )
+            ) );
+        }
+    } // End check_environment()
+
+
+    /**
+     * Load plugin files
+     */
+    public function load_files() : void {
+        $this->check_environment();
+
+        foreach ( self::FILES as $file ) {
+            $path = self::path( 'inc/' . $file );
+            if ( file_exists( $path ) ) {
+                require_once $path;
+            } else {
+                _doing_it_wrong(
+                    __METHOD__,
+                    sprintf( 'File not found: %s', esc_html( $path ) ),
+                    esc_html( self::version() )
+                );
+            }
+        }
+
+        if ( ! is_admin() ) {
+            foreach ( self::FRONT_END_FILES as $file ) {
+                $path = self::path( 'inc/' . $file );
+                if ( file_exists( $path ) ) {
+                    require_once $path;
+                } else {
+                    _doing_it_wrong(
+                        __METHOD__,
+                        sprintf( 'File not found: %s', esc_html( $path ) ),
+                        esc_html( self::version() )
+                    );
+                }
+            }
+        }
+
+        if ( is_admin() ) {
+            foreach ( self::ADMIN_FILES as $file ) {
+                $path = self::path( 'inc/' . $file );
+                if ( file_exists( $path ) ) {
+                    require_once $path;
+                } else {
+                    _doing_it_wrong(
+                        __METHOD__,
+                        sprintf( 'File not found: %s', esc_html( $path ) ),
+                        esc_html( self::version() )
+                    );
+                }
+            }
+        }
+    } // End load_files()
+
+
+    /**
+     * Get metadata value
+     */
+    public static function meta( string $key ) : string {
+        return self::$instance->meta[ $key ] ?? '';
+    } // End meta()
+
+
+    /**
+     * Plugin URL
+     */
+    public static function url( string $append = '' ) : string {
+        return plugin_dir_url( __FILE__ ) . ltrim( $append, '/' );
+    } // End url()
+
+
+    /**
+     * Plugin path
+     */
+    public static function path( string $append = '' ) : string {
+        return plugin_dir_path( __FILE__ ) . ltrim( $append, '/' );
+    } // End path()
+
+
+    /**
+     * Settings URL
+     */
+    public static function settings_url() : string {
+        return admin_url( 'tools.php?page=' . self::meta( 'textdomain' ) );
+    } // End settings_url()
+
+
+    /**
+     * Plugin name
+     */
+    public static function name() : string {
+        return self::meta( 'name' );
+    } // End name()
+
+
+    /**
+     * Plugin version
+     */
+    public static function version() : string {
+        return self::meta( 'version' );
+    } // End version()
+
+
+    /**
+     * Script version
+     */
+    public static function script_version() : string {
+        if ( self::is_test_mode() ) {
+            return 'TEST-' . time();
+        }
+        return self::version();
+    } // End script_version()
+
+
+    /**
+     * Text domain
+     */
+    public static function textdomain() : string {
+        return self::meta( 'textdomain' );
+    } // End textdomain()
+
+
+    /**
+     * Plugin file
+     */
+    public static function plugin_file() : string {
+        return plugin_basename( __FILE__ );
+    } // End plugin_file()
+
+
+    /**
+     * Author
+     */
+    public static function author() : string {
+        return self::meta( 'author' );
+    } // End author()
+
+
+    /**
+     * Plugin URI
+     */
+    public static function plugin_uri() : string {
+        return self::meta( 'plugin_uri' );
+    } // End plugin_uri()
+
+
+    /**
+     * Author URI
+     */
+    public static function author_uri() : string {
+        return self::meta( 'author_uri' );
+    } // End author_uri()
+
+
+    /**
+     * Discord URI
+     */
+    public static function discord_uri() : string {
+        return self::meta( 'discord_uri' );
+    } // End discord_uri()
+
+
+    /**
+     * Prevent cloning/unserializing
+     */
+    public function __clone() {}
+    public function __wakeup() {}
+
 }
+
+
+Bootstrap::instance();

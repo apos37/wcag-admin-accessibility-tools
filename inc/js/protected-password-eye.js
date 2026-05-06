@@ -1,5 +1,5 @@
 jQuery( $ => {
-    console.log( 'Password Protected Eye JS Loaded...' );
+    // console.log( 'Password Protected Eye JS Loaded...' );
 
     // Select the password field by its NAME attribute, as its ID is dynamic.
     const passwordField = $( 'input[name="post_password"]' );

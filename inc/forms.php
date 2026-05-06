@@ -3,29 +3,12 @@
  * Form Enhancements
  */
 
+namespace PluginRx\WCAGAdminAccessibilityTools;
 
-/**
- * Define Namespaces
- */
-namespace Apos37\WCAGAdminAccessibilityTools;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-
-/**
- * Exit if accessed directly.
- */
-if ( !defined( 'ABSPATH' ) ) exit;
-
-
-/**
- * Initiate the class
- */
-new Forms();
-
-
-/**
- * The class.
- */
 class Forms {
+
 
     /**
      * Option to check if a skip link is present
@@ -44,19 +27,29 @@ class Forms {
 
 
     /**
+     * The single instance of the class
+     *
+     * @var self|null
+     */
+    private static ?Forms $instance = null;
+
+
+    /**
+     * Get the singleton instance
+     *
+     * @return self
+     */
+    public static function instance() : self {
+        return self::$instance ??= new self();
+    } // End instance()
+
+
+    /**
 	 * Constructor
 	 */
 	public function __construct() {
-
-        // Add a password eye to password protected pages
-        $this->add_eye_to_password_protected_pages = filter_var( get_option( $this->protected_password_eye_option, false ), FILTER_VALIDATE_BOOLEAN );
-        if ( $this->add_eye_to_password_protected_pages ) {
-            add_action( 'the_password_form', [ $this, 'add_password_eye_to_form' ] );
-        }
-
-        // Enqueue scripts and styles
+        add_action( 'the_password_form', [ $this, 'add_password_eye_to_form' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ] );
-
 	} // End __construct()
 
 
@@ -91,13 +84,16 @@ class Forms {
             return;
         }
         
-        if ( $this->add_eye_to_password_protected_pages ) {
-            $handle = 'wcagaat-protected-password-eye';
-            wp_enqueue_style( 'dashicons' );
-            wp_enqueue_script( 'jquery' );
-            wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'protected-password-eye.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
-            wp_enqueue_style( $handle, WCAGAAT_CSS_PATH . 'protected-password-eye.css', [], WCAGAAT_SCRIPT_VERSION );
-        }
+        $handle = 'wcagaat-protected-password-eye';
+        wp_enqueue_style( 'dashicons' );
+        wp_enqueue_script( 'jquery' );
+        wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/protected-password-eye.js' ), [ 'jquery' ], Bootstrap::script_version(), true );
+        wp_enqueue_style( $handle, Bootstrap::url( 'inc/css/protected-password-eye.css' ), [], Bootstrap::script_version() );
     } // End enqueue()
 
+}
+
+
+if ( Settings::get( 'protected_password_eye', false ) ) {
+    Forms::instance();
 }

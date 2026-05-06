@@ -7,7 +7,7 @@
 /**
  * Define Namespaces
  */
-namespace Apos37\WCAGAdminAccessibilityTools;
+namespace PluginRx\WCAGAdminAccessibilityTools;
 
 
 /**

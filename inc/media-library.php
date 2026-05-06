@@ -4,28 +4,12 @@
  */
 
 
-/**
- * Define Namespaces
- */
-namespace Apos37\WCAGAdminAccessibilityTools;
+namespace PluginRx\WCAGAdminAccessibilityTools;
 
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-/**
- * Exit if accessed directly.
- */
-if ( !defined( 'ABSPATH' ) ) exit;
-
-
-/**
- * Initiate the class
- */
-new MediaLibrary();
-
-
-/**
- * The class.
- */
 class MediaLibrary {
+
 
     /**
      * Nonce
@@ -33,6 +17,24 @@ class MediaLibrary {
      * @var string
      */
     private $nonce = 'media_library_alt_text';
+
+
+    /**
+     * The single instance of the class
+     *
+     * @var self|null
+     */
+    private static ?MediaLibrary $instance = null;
+
+
+    /**
+     * Get the singleton instance
+     *
+     * @return self
+     */
+    public static function instance() : self {
+        return self::$instance ??= new self();
+    } // End instance()
 
 
     /**
@@ -53,7 +55,7 @@ class MediaLibrary {
         }
 
         // Alt text ajax (which is also used by the admin bar)
-        if ( $this->doing_alt_text() || get_option( 'wcagaat_admin_bar', true ) ) {
+        if ( $this->doing_alt_text() || Settings::get( 'admin_bar' ) ) {
             add_action( 'wp_ajax_alt_text_update', [ $this, 'ajax_update_alt_text' ] );
         }
 
@@ -71,7 +73,7 @@ class MediaLibrary {
      * @return bool
      */
     private function doing_alt_text() {
-        return (bool) get_option( 'wcagaat_media_library_alt_text', true );
+        return (bool) Settings::get( 'media_library_alt_text' );
     } // End doing_alt_text()
 
 
@@ -81,7 +83,7 @@ class MediaLibrary {
      * @return bool
      */
     private function doing_other_cols() {
-        return (bool) get_option( 'wcagaat_media_library_other_cols', true );
+        return (bool) Settings::get( 'media_library_other_cols' );
     } // End doing_other_cols()
 
     
@@ -232,14 +234,14 @@ class MediaLibrary {
      * Handle AJAX request to update the alt text.
      */
     public function ajax_update_alt_text() {
-        if ( !current_user_can( 'upload_files' ) || !check_ajax_referer( $this->nonce, 'nonce', false ) ) {
+        if ( ! current_user_can( 'upload_files' ) || ! check_ajax_referer( $this->nonce, 'nonce', false ) ) {
             wp_send_json_error( 'Permission denied.' );
         }
 
         $post_id = isset( $_POST[ 'post_id' ] ) ? absint( wp_unslash( $_POST[ 'post_id' ] ) ) : 0;
         $alt = isset( $_POST[ 'alt_text' ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'alt_text' ] ) ) : '';
 
-        if ( !get_post( $post_id ) ) {
+        if ( ! get_post( $post_id ) ) {
             wp_send_json_error( 'Invalid attachment ID.' );
         }
 
@@ -260,7 +262,7 @@ class MediaLibrary {
         }
 
         $handle = 'wcagaat_media_alt_edit';
-        wp_enqueue_script( $handle, WCAGAAT_JS_PATH . 'media-library.js', [ 'jquery' ], WCAGAAT_SCRIPT_VERSION, true );
+        wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/media-library.js' ), [ 'jquery' ], Bootstrap::script_version(), true );
         wp_localize_script( $handle, $handle, [
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( $this->nonce ),
@@ -272,3 +274,6 @@ class MediaLibrary {
     } // End enqueue_scripts()
 
 }
+
+
+MediaLibrary::instance();

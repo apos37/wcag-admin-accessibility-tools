@@ -1,0 +1,130 @@
+/* Dyslexia / Readable Font Stack */
+body.wcagaat-readable-font {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+}
+
+body.wcagaat-readable-font *:not(
+    #wpadminbar, 
+    #wpadminbar *,
+    #wcagaat-assistant-container, 
+    #wcagaat-assistant-container *, 
+    .fa, .fas, .far, .fa-classic, .fa-regular, .fa-solid, .fa-light, .fa-duotone, .fa-brands, .x-icon, .x-anchor-sub-indicator
+) {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+}
+
+/* Readable Font Toggle Button */
+#wcagaat-readable-font-solo {
+    background-color: #111;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    box-shadow: 2px 2px 10px 0 rgba(0, 2, 0, 0.4);
+    box-sizing: border-box;
+    position: relative;
+}
+
+#wcagaat-readable-font-solo button {
+    width: 100% !important;
+    height: 100% !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#wcagaat-readable-font-solo i.wcagaat-font-icon {
+    color: #ffffff;
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+}
+
+#wcagaat-readable-font-solo[data-current="on"] i.wcagaat-font-icon {
+    color: #f39c12;
+}
+
+/* Float positioning */
+#wcagaat-readable-font-solo[data-location^="float-"] {
+    position: fixed;
+    bottom: 20px;
+    z-index: 9999;
+}
+
+#wcagaat-readable-font-solo[data-location="float-left"] { left: 20px; }
+#wcagaat-readable-font-solo[data-location="float-right"] { right: 20px; }
+
+/* Tooltip - Reusing your text-resizer logic */
+#wcagaat-readable-font-solo .wcagaat-tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    background: #222;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    font-family: sans-serif;
+}
+
+/* Tooltip Arrow Base */
+#wcagaat-readable-font-solo .wcagaat-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #222 transparent transparent transparent;
+}
+
+/* Float Left Adjustments */
+#wcagaat-readable-font-solo[data-location="float-left"] .wcagaat-tooltip {
+    left: 0;
+    transform: translateY( 5px );
+}
+#wcagaat-readable-font-solo[data-location="float-left"] .wcagaat-tooltip:after {
+    left: 15px;
+}
+#wcagaat-readable-font-solo[data-location="float-left"]:hover .wcagaat-tooltip {
+    transform: translateY( 0 );
+}
+
+/* Float Right Adjustments */
+#wcagaat-readable-font-solo[data-location="float-right"] .wcagaat-tooltip {
+    right: 0;
+    transform: translateY( 5px );
+}
+#wcagaat-readable-font-solo[data-location="float-right"] .wcagaat-tooltip:after {
+    right: 15px;
+}
+#wcagaat-readable-font-solo[data-location="float-right"]:hover .wcagaat-tooltip {
+    transform: translateY( 0 );
+}
+
+/* Default/Centered Logic (for non-floating types) */
+#wcagaat-readable-font-solo:not([data-location^="float-"]) .wcagaat-tooltip {
+    left: 50%;
+    transform: translateX( -50% ) translateY( 5px );
+}
+#wcagaat-readable-font-solo:not([data-location^="float-"]) .wcagaat-tooltip:after {
+    left: 50%;
+    margin-left: -5px;
+}
+#wcagaat-readable-font-solo:not([data-location^="float-"]):hover .wcagaat-tooltip {
+    transform: translateX( -50% ) translateY( 0 );
+}
+
+#wcagaat-readable-font-solo:hover .wcagaat-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
