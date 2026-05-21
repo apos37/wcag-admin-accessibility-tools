@@ -19,14 +19,6 @@ class Forms {
 
 
     /**
-     * Whether to add the password eye to password protected pages
-     *
-     * @var bool
-     */
-    private $add_eye_to_password_protected_pages = false;
-
-
-    /**
      * The single instance of the class
      *
      * @var self|null

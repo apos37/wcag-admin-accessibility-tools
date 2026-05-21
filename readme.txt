@@ -2,9 +2,9 @@
 Contributors: apos37
 Tags: accessibility, alt text, screen reader, WCAG, a11y
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 1.2.0
+Stable tag: 1.2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -58,6 +58,10 @@ High contrast requirements vary significantly depending on user needs and conten
 We recommend using our [website support forum](https://pluginrx.com/support/plugin/wcag-admin-accessibility-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/wcag-admin-accessibility-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 == Changelog ==
+= 1.2.0.1 =
+* Compatibility: Tested with WordPress 7.0
+* Tweak: Made the User Assistant CSS important so it's less likely to be overridden
+
 = 1.2.0 =
 * Update: Added a full User Assistant instead of just a modes selector, with a text resizer and readable font option (more to come)
 * Deprecated: [wcagaat_modes] has been changed to [wcagaat_assistant]
