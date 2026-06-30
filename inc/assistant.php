@@ -630,7 +630,7 @@ class Assistant {
         $current_prefs = [];
         foreach ( self::USER_PREFS_DEFAULTS as $key => $def ) {
             $current_prefs[ $key ] = self::get_user_pref( $key );
-        }        
+        }
 
         // JS
         $handle = 'wcagaat_assistant_js';
@@ -645,6 +645,7 @@ class Assistant {
             'dark_mode_logo'  => sanitize_url( Settings::get( 'dark_logo' ) ),
             'current_prefs'   => $current_prefs,
             'has_mode'        => $has_mode,
+            'auto_detect_dark_mode' => filter_var( get_option( 'wcagaat_auto_detect_dark_mode', FALSE ), FILTER_VALIDATE_BOOLEAN ),
             'text'      => [
                 'reset'             => __( 'Reset to default', 'wcag-admin-accessibility-tools' ),
                 'resetting'         => __( 'Resetting', 'wcag-admin-accessibility-tools' ),

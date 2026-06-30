@@ -269,7 +269,7 @@ jQuery( $ => {
 	 * Suggest dark mode if user prefers it and it's not already set
 	 */
 	function maybeSuggestDarkMode() {
-		if ( wcagaat_assistant.has_mode ) {
+		if ( wcagaat_assistant.has_mode || ! wcagaat_assistant.auto_detect_dark_mode ) {
 			return;
 		}
 

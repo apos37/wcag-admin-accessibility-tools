@@ -3,7 +3,7 @@
  * Plugin Name:         WCAG Admin Accessibility Tools
  * Plugin URI:          https://pluginrx.com/plugin/wcag-admin-accessibility-tools/
  * Description:         Admin-side accessibility enhancements and tools to assist with WCAG compliance.
- * Version:             1.2.0.1
+ * Version:             1.2.0.2
  * Requires at least:   6.0
  * Tested up to:        7.0
  * Requires PHP:        8.0
