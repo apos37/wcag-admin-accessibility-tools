@@ -3,9 +3,9 @@
  * Plugin Name:         WCAG Admin Accessibility Tools
  * Plugin URI:          https://pluginrx.com/plugin/wcag-admin-accessibility-tools/
  * Description:         Admin-side accessibility enhancements and tools to assist with WCAG compliance.
- * Version:             1.2.0.2
+ * Version:             1.3.0
  * Requires at least:   6.0
- * Tested up to:        7.0
+ * Tested up to:        7.1
  * Requires PHP:        8.0
  * Author:              PluginRx
  * Author URI:          https://pluginrx.com/
@@ -46,6 +46,8 @@ final class Bootstrap {
     public const FRONT_END_FILES = [
         'admin-bar.php',
         'forms.php',
+        'cornerstone.php',
+        'recaptcha.php',
     ];
 
 

@@ -2,9 +2,9 @@
 Contributors: apos37
 Tags: accessibility, alt text, screen reader, WCAG, a11y
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 1.2.0.2
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -58,6 +58,12 @@ High contrast requirements vary significantly depending on user needs and conten
 We recommend using our [website support forum](https://pluginrx.com/support/plugin/wcag-admin-accessibility-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/wcag-admin-accessibility-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 == Changelog ==
+= 1.3.0 =
+* Update: Added External Link Notice option that adds visually hidden text (customizable) to links that lead to other websites so screen readers announce them
+* Update: Added "External Links Without Notice (Advisory)" toggle to the front-end admin bar tools
+* Update: Added Cornerstone Menu Accessibility option, shown only when Cornerstone or the Pro theme is active, that keeps the expanded and collapsed state of dropdown menus accurate for screen readers and makes Enter or a screen reader click on a parent menu item follow its link
+* Update: Added Gravity Forms reCAPTCHA integration option that labels the hidden response field, shown only when the add-on is active
+
 = 1.2.0.2 =
 * Fix: Auto detecting dark mode would not turn off after turning on
 

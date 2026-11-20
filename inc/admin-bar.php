@@ -97,6 +97,10 @@ class AdminBar {
                 'key'   => 'underline-links',
                 'label' => __( 'Links Missing Underlines', 'wcag-admin-accessibility-tools' )
             ],
+            [
+                'key'   => 'external-links',
+                'label' => __( 'External Links Without Notice (Advisory)', 'wcag-admin-accessibility-tools' )
+            ],
         ];
         
         foreach ( $tools as $tool ) {
@@ -121,7 +125,7 @@ class AdminBar {
 
 		$handle = 'wcagaat_admin_bar';
         wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/admin-bar.js' ), [ 'jquery' ], Bootstrap::script_version(), true );
+        wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/admin-bar.js' ), [ 'jquery', 'wcagaat-structural' ], Bootstrap::script_version(), true );
 		wp_localize_script( $handle, $handle, [
             // 'ajaxurl'         => admin_url( 'admin-ajax.php' ),
             // 'nonce'           => wp_create_nonce( $this->nonce ),

@@ -242,6 +242,25 @@ class Settings {
                 'comments'  => $warning,
             ],
             [
+                'section'   => 'structural',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'external_link_notice',
+                'title'     => $data_only ? '' : __( 'External Link Notice', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds visually hidden text to links that go to another website so screen reader users know they are leaving this site. Links that already include a notice are skipped.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
+            ],
+            [
+                'section'    => 'structural',
+                'type'       => 'text',
+                'sanitize'   => 'sanitize_text_field',
+                'key'        => 'external_link_notice_text',
+                'title'      => $data_only ? '' : __( 'External Link Notice Text', 'wcag-admin-accessibility-tools' ),
+                'desc'       => $data_only ? '' : __( 'The text announced after the link name. Leave blank to use "(external site)".', 'wcag-admin-accessibility-tools' ),
+                'default'    => '',
+                'conditions' => [ 'external_link_notice' ],
+            ],
+            [
                 'section'   => 'forms',
                 'type'      => 'checkbox',
                 'sanitize'  => [ $this, 'sanitize_checkbox' ],
@@ -458,6 +477,30 @@ class Settings {
                 'default'   => FALSE
             ]
         ];
+
+        if ( $data_only || ( new Integrations() )->has_cornerstone_builder() ) {
+            $options[] = [
+                'section'   => 'structural',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'cornerstone_menus',
+                'title'     => $data_only ? '' : __( 'Cornerstone Menu Accessibility', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Keeps the expanded and collapsed state of Cornerstone dropdown menus accurate for screen readers, and makes Enter or a screen reader click on a parent menu item follow its link instead of only toggling the submenu. Touch taps still open the submenu.', 'wcag-admin-accessibility-tools' ),
+                'default'   => FALSE,
+            ];
+        }
+
+        if ( $data_only || ( new Integrations() )->is_gravityformsrecaptcha_active() ) {
+            $options[] = [
+                'section'   => 'forms',
+                'type'      => 'checkbox',
+                'sanitize'  => [ $this, 'sanitize_checkbox' ],
+                'key'       => 'recaptcha_label',
+                'title'     => $data_only ? '' : __( 'Label reCAPTCHA Response Field', 'wcag-admin-accessibility-tools' ),
+                'desc'      => $data_only ? '' : __( 'Adds an accessible label to the hidden response field that the Gravity Forms reCAPTCHA Add-On loads, which checkers such as WAVE flag as an unlabeled form control.', 'wcag-admin-accessibility-tools' ),
+                'default'   => TRUE,
+            ];
+        }
 
         // Apply filter to allow developers to add custom fields
         $options = apply_filters( 'wcagaat_custom_settings', $options );

@@ -4,12 +4,17 @@ jQuery( $ => {
     /**
      * Check the page for issues on load
      */
+    const tools = {
+        'alt-text': { check: checkAltBubbles, remove: removeAltBubbles },
+        'contrast': { check: checkColorContrast, remove: removeColorContrast },
+        'vague-link-text': { check: checkVagueLinkTexts, remove: removeVagueLinkTexts },
+        'heading-hierarchy': { check: checkHeadings, remove: removeHeadings },
+        'underline-links': { check: checkUnderlineIssues, remove: removeUnderlineIssues },
+        'external-links': { check: checkExternalLinks, remove: removeExternalLinks }
+    };
+
     function countPageIssues() {
-        checkAltBubbles( true );
-        checkColorContrast( true );
-        checkVagueLinkTexts( true );
-        checkHeadings( true );
-        checkUnderlineIssues( true );
+        Object.values( tools ).forEach( tool => tool.check( true ) );
         updateTotalIssues();
     }
     $( document ).ready( countPageIssues );
@@ -48,47 +53,51 @@ jQuery( $ => {
      * Toggle the checkboxes in the admin bar
      */
     $( '#wp-admin-bar-wcagaat input[type="checkbox"]' ).on( 'change', function() {
-        const $this = $( this );
-        const tool = $this.data( 'tool' );
-        const state = $this.is( ':checked' );
+        const input = $( this );
+        const toolKey = input.data( 'tool' );
 
-        // Uncheck all others and remove their effects
-        $( '#wp-admin-bar-wcagaat input[type="checkbox"]' ).not( this ).each( function() {
-            const $input = $( this );
-            const otherTool = $input.data( 'tool' );
+        $( '#wp-admin-bar-wcagaat input[type="checkbox"]:checked' ).not( this ).each( function() {
+            const other = $( this );
+            other.prop( 'checked', false );
+            tools[ other.data( 'tool' ) ].remove();
+        } );
 
-            if ( $input.is( ':checked' ) ) {
-                $input.prop( 'checked', false );
+        if ( input.is( ':checked' ) ) {
+            tools[ toolKey ].check( false, true );
+        } else {
+            tools[ toolKey ].remove();
+        }
+    } );
 
-                switch ( otherTool ) {
-                    case 'alt-text': removeAltBubbles(); break;
-                    case 'contrast': removeColorContrast(); break;
-                    case 'vague-link-text': removeVagueLinkTexts(); break;
-                    case 'heading-hierarchy': removeHeadings(); break;
-                    case 'underline-links': removeUnderlineIssues(); break;
-                }
+    function checkExternalLinks( countOnly = false ) {
+        let count = 0;
+
+        $( 'a[href]:visible' ).not( '#wpadminbar a' ).each( function() {
+            const link = this;
+
+            if ( ! wcagaatExternal.isExternal( link ) || wcagaatExternal.hasNotice( link ) ) {
+                return;
+            }
+
+            count++;
+
+            if ( wcagaat_admin_bar.doing_console ) {
+                console.log( 'External link without notice:', link );
+            }
+
+            if ( ! countOnly ) {
+                $( link ).addClass( 'wcagaat-external-issue' );
             }
         } );
 
-        // For the current checkbox, run check or remove accordingly
-        if ( state ) {
-            switch ( tool ) {
-                case 'alt-text': checkAltBubbles( false, true ); break;
-                case 'contrast': checkColorContrast(); break;
-                case 'vague-link-text': checkVagueLinkTexts(); break;
-                case 'heading-hierarchy': checkHeadings(); break;
-                case 'underline-links': checkUnderlineIssues(); break;
-            }
-        } else {
-            switch ( tool ) {
-                case 'alt-text': removeAltBubbles(); break;
-                case 'contrast': removeColorContrast(); break;
-                case 'vague-link-text': removeVagueLinkTexts(); break;
-                case 'heading-hierarchy': removeHeadings(); break;
-                case 'underline-links': removeUnderlineIssues(); break;
-            }
+        if ( countOnly ) {
+            $( '.wcagaat-count[data-tool="external-links"]' ).text( count > 0 ? `(${count})` : '(0)' );
         }
-    } );
+    }
+
+    function removeExternalLinks() {
+        $( '.wcagaat-external-issue' ).removeClass( 'wcagaat-external-issue' );
+    }
 
 
     /**
@@ -493,5 +502,17 @@ jQuery( $ => {
         $( '.wcagaat-underline-label' ).remove();
         // $( '.wcagaat-count[data-tool="underline-links"]' ).text( '' );
     }
+
+    $( '#wpadminbar a' ).each( function () {
+        const link = $( this );
+        const icon = link.children( 'img[alt=""]' );
+        const name = link.attr( 'title' ) || link.attr( 'aria-label' ) || '';
+
+        if ( ! icon.length || ! name || link.text().trim() !== '' ) {
+            return;
+        }
+
+        icon.attr( 'alt', name );
+    } );
 
 } );

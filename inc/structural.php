@@ -113,6 +113,27 @@ class Structural {
 
 
     /**
+     * Whether the external link notice is enabled
+     *
+     * @return bool
+     */
+    public static function is_external_notice_enabled() {
+        return filter_var( Settings::get( 'external_link_notice' ), FILTER_VALIDATE_BOOLEAN );
+    } // End is_external_notice_enabled()
+
+
+    /**
+     * Get the external link notice text
+     *
+     * @return string
+     */
+    public static function external_notice_text() {
+        $text = trim( sanitize_text_field( Settings::get( 'external_link_notice_text', '' ) ) );
+        return '' !== $text ? $text : __( '(external site)', 'wcag-admin-accessibility-tools' );
+    } // End external_notice_text()
+
+
+    /**
      * Enqueue frontend assets
      */
     public function enqueue() {
@@ -121,10 +142,14 @@ class Structural {
         }
 
         $script_version = Bootstrap::script_version();
-        
+
         $handle = 'wcagaat-structural';
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( $handle, Bootstrap::url( 'inc/js/structural.js' ), [ 'jquery' ], $script_version, true );
+        wp_localize_script( $handle, 'wcagaat_structural', [
+            'apply_notice' => self::is_external_notice_enabled(),
+            'notice_text'  => self::external_notice_text(),
+        ] );
         wp_enqueue_style( $handle, Bootstrap::url( 'inc/css/structural.css' ), [], $script_version );
     } // End enqueue()
 
